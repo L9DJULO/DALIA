@@ -1,0 +1,1145 @@
+<!doctype html>
+<html lang="fr" data-accent="red">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>DALIA — Draft Analysis League Intelligence Assistant</title>
+<meta name="description" content="Assistant de draft pour League of Legends. Recommandations IA, matchups Lolalytics, prédiction ML et synchro live avec le client."/>
+<link rel="icon" type="image/png" href="assets/logo.png"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --ink-0:#000; --ink-1:#08080a; --ink-2:#111114; --ink-3:#1a1a1e; --ink-4:#26262c; --ink-5:#3a3a42;
+  --bone-0:#f4efe6; --bone-1:#e8e1d2; --bone-2:#9a958a; --bone-3:#6e6a61;
+  --accent:#d91e2b; --accent-hover:#f02233; --accent-pressed:#b81825;
+  --accent-muted:rgba(217,30,43,.14); --accent-subtle:rgba(217,30,43,.06);
+  --accent-glow:rgba(217,30,43,.35); --accent-ring:rgba(217,30,43,.50);
+  --ok:#9cd36b; --warn:#f5b027; --bad:#ff4d56; --blue-team:#4a8bff;
+  --f-display:"Oswald",Impact,sans-serif; --f-body:"Inter",system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,monospace;
+  --edge:2.5px; --skew:-1deg; --radius:2px;
+  --border:rgba(244,239,230,.10); --border-subtle:rgba(244,239,230,.06); --border-strong:rgba(244,239,230,.20);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--ink-0); color:var(--bone-0); font-family:var(--f-body); font-size:14px; line-height:1.5;
+  -webkit-font-smoothing:antialiased; overflow-x:hidden;
+}
+body::before{
+  content:''; position:fixed; inset:0; z-index:0; pointer-events:none;
+  background-image:repeating-linear-gradient(45deg,transparent 0 18px,rgba(244,239,230,.05) 18px 19px);
+  opacity:.7;
+}
+::selection{background:var(--accent-muted); color:var(--bone-0)}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--ink-1)}
+::-webkit-scrollbar-thumb{background:var(--ink-4)}
+a{color:inherit;text-decoration:none}
+img{display:block;max-width:100%}
+button{font-family:inherit;cursor:pointer;background:none;border:none;color:inherit}
+
+/* ── Layout shell ── */
+.shell{position:relative; z-index:1; width:100%; max-width:1320px; margin:0 auto; padding:0 32px}
+@media (max-width:720px){.shell{padding:0 18px}}
+
+/* ── Top bar ── */
+.nav{
+  position:sticky; top:0; z-index:50;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:14px 32px;
+  background:rgba(0,0,0,.78); backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--border);
+}
+.nav-brand{display:flex;align-items:center;gap:10px}
+.nav-brand img{width:30px;height:30px}
+.nav-brand .wm{font-family:var(--f-display);font-weight:700;font-size:18px;letter-spacing:.22em}
+.nav-brand .v{font-family:var(--f-mono);font-size:9px;letter-spacing:.2em;color:var(--bone-3)}
+.nav-links{display:flex;gap:26px}
+.nav-links a{
+  font-family:var(--f-mono); font-size:11px; letter-spacing:.2em; text-transform:uppercase;
+  color:var(--bone-2); padding:6px 0; border-bottom:1.5px solid transparent; transition:.15s;
+}
+.nav-links a:hover{color:var(--bone-0); border-bottom-color:var(--accent)}
+.nav-cta{
+  font-family:var(--f-display); font-size:13px; letter-spacing:.18em; font-weight:700;
+  padding:8px 16px; background:var(--accent); color:#000;
+  border:var(--edge) solid var(--accent);
+  transition:.12s;
+}
+.nav-cta:hover{background:var(--accent-hover); border-color:var(--accent-hover)}
+@media (max-width:720px){
+  .nav{padding:12px 18px}
+  .nav-links{display:none}
+}
+
+/* ── Eyebrow / mono label ── */
+.eyebrow{
+  font-family:var(--f-mono); font-size:11px; letter-spacing:.22em; color:var(--accent);
+  text-transform:uppercase; padding-bottom:6px;
+  border-bottom:1.5px solid var(--accent); display:inline-block;
+}
+.mono-tag{
+  display:inline-flex; align-items:center; gap:6px;
+  font-family:var(--f-mono); font-size:10px; letter-spacing:.22em;
+  color:var(--bone-2); text-transform:uppercase;
+}
+.mono-tag::before{content:'['; color:var(--accent)}
+.mono-tag::after{content:']'; color:var(--accent)}
+
+/* ── Hero ── */
+.hero{position:relative; padding:96px 0 80px}
+.hero-grid{
+  display:grid; grid-template-columns:1.05fr .95fr; gap:72px; align-items:center;
+}
+@media (max-width:980px){.hero-grid{grid-template-columns:1fr; gap:56px}}
+.hero-eyebrow{margin-bottom:28px; display:flex; align-items:center; gap:14px; flex-wrap:wrap}
+.hero h1{
+  font-family:var(--f-display); font-weight:700;
+  font-size:clamp(72px, 12vw, 168px); line-height:.86; letter-spacing:-.02em;
+  color:var(--bone-0); text-transform:uppercase;
+  margin-bottom:18px;
+}
+.hero h1 .stroke{
+  -webkit-text-stroke:2px var(--bone-0); color:transparent;
+}
+.hero h1 .blade{color:var(--accent); display:inline-block; transform:skewX(var(--skew))}
+.hero-sub{
+  font-family:var(--f-display); font-weight:500;
+  font-size:clamp(18px,1.7vw,22px); letter-spacing:.18em; color:var(--bone-2);
+  text-transform:uppercase; margin-bottom:28px;
+}
+.hero-sub .pipe{color:var(--accent); padding:0 8px}
+.hero-desc{
+  max-width:520px; color:var(--bone-1); font-size:16px; line-height:1.65;
+  margin-bottom:36px;
+}
+.hero-desc strong{color:var(--bone-0); font-weight:600}
+.hero-cta{display:flex; gap:14px; flex-wrap:wrap; margin-bottom:42px}
+
+.btn{
+  display:inline-flex; align-items:center; gap:10px;
+  padding:16px 22px; font-family:var(--f-display); font-weight:700;
+  font-size:14px; letter-spacing:.18em; text-transform:uppercase;
+  border:var(--edge) solid var(--bone-0); transition:.12s;
+  position:relative;
+}
+.btn-primary{
+  background:var(--accent); color:#000; border-color:var(--accent);
+  box-shadow:4px 4px 0 var(--bone-0);
+}
+.btn-primary:hover{background:var(--accent-hover); border-color:var(--accent-hover); transform:translate(-2px,-2px); box-shadow:6px 6px 0 var(--bone-0)}
+.btn-primary:active{transform:translate(0,0); box-shadow:2px 2px 0 var(--bone-0)}
+.btn-ghost{color:var(--bone-0); background:transparent}
+.btn-ghost:hover{background:var(--bone-0); color:#000}
+.btn .arrow{font-family:var(--f-mono); font-weight:700}
+.btn .meta{font-family:var(--f-mono); font-size:10px; letter-spacing:.18em; color:rgba(0,0,0,.55); margin-left:8px; padding-left:10px; border-left:1.5px solid rgba(0,0,0,.35)}
+
+.hero-stats{
+  display:grid; grid-template-columns:repeat(3,1fr); gap:0;
+  border-top:1px solid var(--border); padding-top:26px;
+}
+.hero-stat{padding-right:18px}
+.hero-stat:not(:last-child){border-right:1px solid var(--border)}
+.hero-stat:not(:first-child){padding-left:22px}
+.hero-stat .num{
+  font-family:var(--f-display); font-weight:700; font-size:30px; color:var(--bone-0);
+  letter-spacing:.02em; line-height:1;
+}
+.hero-stat .lbl{
+  font-family:var(--f-mono); font-size:9px; letter-spacing:.22em; color:var(--bone-3);
+  text-transform:uppercase; margin-top:8px;
+}
+
+/* ── Hero artwork ── */
+.hero-art{
+  position:relative; aspect-ratio:1/1; max-width:560px; margin-left:auto;
+  display:flex; align-items:center; justify-content:center;
+}
+.hero-art::before{
+  content:''; position:absolute; inset:0;
+  background:repeating-linear-gradient(45deg,transparent 0 12px,rgba(244,239,230,.07) 12px 13px);
+}
+.hero-art .frame{
+  position:absolute; inset:8% 8% 8% 8%;
+  border:var(--edge) solid var(--bone-0);
+}
+.hero-art .frame::before, .hero-art .frame::after{
+  content:''; position:absolute; background:var(--accent); width:24px; height:var(--edge);
+}
+.hero-art .frame::before{top:-2px; left:-2px}
+.hero-art .frame::after{bottom:-2px; right:-2px}
+.hero-art .corner{position:absolute; background:var(--accent); width:24px; height:var(--edge)}
+.hero-art .c-tr{top:-2px; right:-2px}
+.hero-art .c-bl{bottom:-2px; left:-2px}
+.hero-logo{
+  width:64%; height:auto; filter:drop-shadow(0 10px 40px var(--accent-glow));
+  position:relative; z-index:2;
+  animation: hero-logo-in .9s cubic-bezier(.16,1,.3,1) both;
+}
+@keyframes hero-logo-in{
+  from{opacity:0; transform:scale(.9) rotate(-4deg)}
+  to{opacity:1; transform:scale(1) rotate(0)}
+}
+.hero-art .ring{
+  position:absolute; border-radius:50%; border:1px dashed rgba(244,239,230,.18);
+  animation: ring-spin 60s linear infinite;
+  pointer-events:none;
+}
+.hero-art .r1{inset:6%}
+.hero-art .r2{inset:14%; border-style:solid; border-color:rgba(244,239,230,.06)}
+@keyframes ring-spin{to{transform:rotate(360deg)}}
+.hero-art .corner-mark{
+  position:absolute; font-family:var(--f-mono); font-size:9px; letter-spacing:.2em; color:var(--bone-2); padding:8px 10px;
+  border:1px solid var(--border); background:rgba(0,0,0,.6);
+}
+.hero-art .cm-tl{top:-8px; left:-8px}
+.hero-art .cm-br{bottom:-8px; right:-8px; color:var(--accent); border-color:var(--accent)}
+
+/* ── Section base ── */
+section{position:relative; padding:96px 0; border-top:1px solid var(--border)}
+.section-head{display:flex; align-items:flex-end; justify-content:space-between; gap:32px; margin-bottom:56px; flex-wrap:wrap}
+.section-head h2{
+  font-family:var(--f-display); font-weight:700; font-size:clamp(40px,5vw,64px); line-height:1; letter-spacing:-.01em;
+  text-transform:uppercase; color:var(--bone-0);
+  max-width:780px;
+}
+.section-head h2 em{font-style:normal; color:var(--accent)}
+.section-head .meta{
+  font-family:var(--f-mono); font-size:11px; letter-spacing:.22em; color:var(--bone-2);
+  text-align:right; line-height:1.7;
+}
+.section-head .meta strong{color:var(--bone-0); font-weight:600}
+
+/* ── Feature grid ── */
+.features{
+  display:grid; grid-template-columns:repeat(3,1fr); gap:0;
+  border-top:var(--edge) solid var(--bone-0);
+  border-left:var(--edge) solid var(--bone-0);
+}
+@media (max-width:880px){.features{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:560px){.features{grid-template-columns:1fr}}
+.feat{
+  position:relative; padding:32px 28px 28px;
+  border-right:var(--edge) solid var(--bone-0); border-bottom:var(--edge) solid var(--bone-0);
+  background:var(--ink-1); min-height:280px; display:flex; flex-direction:column;
+  transition:.18s;
+}
+.feat:hover{background:var(--ink-2)}
+.feat .num{
+  font-family:var(--f-mono); font-size:10px; letter-spacing:.22em; color:var(--accent);
+  margin-bottom:18px;
+}
+.feat h3{
+  font-family:var(--f-display); font-weight:700; font-size:22px; letter-spacing:.04em;
+  text-transform:uppercase; color:var(--bone-0); line-height:1.1;
+  margin-bottom:14px;
+}
+.feat p{color:var(--bone-2); font-size:13.5px; line-height:1.6}
+.feat .tags{margin-top:auto; padding-top:18px; display:flex; gap:6px; flex-wrap:wrap}
+.feat .tag{
+  font-family:var(--f-mono); font-size:9px; letter-spacing:.18em; text-transform:uppercase;
+  padding:3px 7px; border:1.5px solid var(--ink-5); color:var(--bone-2);
+}
+.feat .tag.hot{color:var(--accent); border-color:var(--accent); background:var(--accent-subtle)}
+.feat .glyph{
+  position:absolute; top:24px; right:24px; opacity:.55;
+  font-family:var(--f-display); font-size:48px; line-height:1; color:var(--ink-5);
+  font-weight:700;
+}
+
+/* ── Pillars / scoring ── */
+.pillars{
+  display:grid; grid-template-columns:repeat(7,1fr);
+  gap:0; border:var(--edge) solid var(--bone-0); background:var(--ink-1);
+}
+@media (max-width:880px){.pillars{grid-template-columns:repeat(2,1fr)}}
+.pillar{
+  padding:22px 18px; border-right:1px solid var(--ink-5);
+  display:flex; flex-direction:column; gap:8px; min-height:160px;
+}
+.pillar:last-child{border-right:none}
+.pillar .pct{
+  font-family:var(--f-display); font-weight:700; font-size:38px; line-height:1; color:var(--accent);
+  letter-spacing:.02em;
+}
+.pillar .lbl{font-family:var(--f-mono); font-size:9px; letter-spacing:.22em; color:var(--bone-2); text-transform:uppercase}
+.pillar .desc{font-size:12px; color:var(--bone-2); line-height:1.5; margin-top:auto}
+@media (max-width:880px){
+  .pillar{border-right:none; border-bottom:1px solid var(--ink-5)}
+  .pillar:nth-child(odd){border-right:1px solid var(--ink-5)}
+}
+
+/* ── App preview ── */
+.preview-wrap{
+  position:relative; border:var(--edge) solid var(--bone-0); background:var(--ink-1);
+  overflow:hidden;
+}
+.preview-bar{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:10px 14px; background:var(--ink-2); border-bottom:var(--edge) solid var(--bone-0);
+  font-family:var(--f-mono); font-size:10px; letter-spacing:.18em; color:var(--bone-2); text-transform:uppercase;
+}
+.preview-bar .dots{display:flex; gap:6px}
+.preview-bar .dots span{width:9px; height:9px; background:var(--ink-5); border:1px solid var(--ink-5)}
+.preview-bar .dots span:first-child{background:var(--accent); border-color:var(--accent)}
+.preview-bar .right{display:flex; gap:18px; align-items:center}
+.preview-bar .lcu{display:flex; align-items:center; gap:8px; color:var(--ok)}
+.preview-bar .lcu::before{content:''; width:7px; height:7px; border-radius:50%; background:var(--ok); box-shadow:0 0 6px var(--ok); animation:pulse-dot 1.8s ease-in-out infinite}
+@keyframes pulse-dot{0%,100%{opacity:1; transform:scale(1)} 50%{opacity:.4; transform:scale(1.3)}}
+
+.preview-body{
+  display:grid; grid-template-columns:300px 1fr;
+  min-height:560px;
+}
+@media (max-width:880px){.preview-body{grid-template-columns:1fr; min-height:0}}
+
+/* Sidebar */
+.pv-side{
+  border-right:var(--edge) solid var(--bone-0); background:var(--ink-2); padding:18px 16px;
+}
+.pv-side .head{
+  font-family:var(--f-mono); font-size:10px; letter-spacing:.22em; color:var(--accent); text-transform:uppercase;
+  padding-bottom:6px; border-bottom:1.5px solid var(--accent); margin-bottom:14px;
+}
+.reco{
+  display:flex; align-items:center; gap:10px; padding:8px 6px; border-bottom:1px solid var(--ink-5);
+  cursor:default; transition:.12s;
+}
+.reco:hover{background:var(--ink-3)}
+.reco.sel{background:var(--accent-subtle); border-left:2px solid var(--accent); padding-left:10px}
+.reco .rank{font-family:var(--f-mono); font-size:11px; color:var(--bone-3); width:18px; flex-shrink:0}
+.reco.sel .rank{color:var(--accent)}
+.reco .port{
+  width:38px; height:38px; flex-shrink:0; background:var(--ink-3);
+  border:1.5px solid var(--bone-0); position:relative; overflow:hidden;
+}
+.reco .port img{width:100%; height:100%; object-fit:cover; display:block}
+.reco .info{flex:1; min-width:0}
+.reco .name{font-family:var(--f-display); font-weight:700; font-size:13px; letter-spacing:.06em; color:var(--bone-0); text-transform:uppercase; line-height:1; margin-bottom:6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.reco .row{display:flex; align-items:center; gap:6px}
+.reco .score{font-family:var(--f-display); font-weight:700; font-size:14px; color:var(--accent); line-height:1}
+.reco .tier{
+  display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px;
+  font-family:var(--f-display); font-weight:700; font-size:10px; border:1.5px solid currentColor;
+}
+.reco .tier.s{color:var(--accent)} .reco .tier.a{color:var(--ok)} .reco .tier.b{color:var(--bone-1)}
+.reco .ptag{font-family:var(--f-mono); font-size:8px; letter-spacing:.16em; color:var(--bone-2); padding:1px 5px; border:1px solid var(--ink-5); text-transform:uppercase}
+
+/* Right column */
+.pv-main{display:flex; flex-direction:column; min-width:0}
+.pv-board{
+  display:grid; grid-template-columns:1fr 1fr; border-bottom:var(--edge) solid var(--bone-0);
+}
+.pv-team{padding:14px 18px}
+.pv-team.blue{background:var(--ink-2); border-right:var(--edge) solid var(--bone-0)}
+.pv-team.red{background:var(--ink-3)}
+.pv-team .th{display:flex; justify-content:space-between; align-items:baseline; padding-bottom:8px; border-bottom:1px solid var(--ink-5); margin-bottom:10px}
+.pv-team .name{font-family:var(--f-display); font-weight:700; font-size:18px; letter-spacing:.22em}
+.pv-team.blue .name{color:var(--blue-team)}
+.pv-team.red .name{color:var(--accent)}
+.pv-team .side{font-family:var(--f-mono); font-size:9px; letter-spacing:.18em; color:var(--bone-2); text-transform:uppercase}
+.pv-bans{display:flex; gap:4px; margin-bottom:10px; min-height:24px}
+.pv-team.red .pv-bans{justify-content:flex-end}
+.pv-ban{
+  width:22px; height:22px; background:var(--ink-3); border:1.5px solid var(--bone-3);
+  position:relative; opacity:.7; overflow:hidden;
+}
+.pv-ban img{width:100%; height:100%; object-fit:cover; filter:grayscale(1) brightness(.4); display:block}
+.pv-ban::after{content:'×'; position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:var(--bad); font-family:var(--f-display); font-weight:700; font-size:14px; line-height:1; z-index:2}
+.pv-row{
+  display:grid; grid-template-columns:44px 44px 1fr; gap:8px; align-items:center;
+  padding:5px 0; border-bottom:1px solid var(--ink-5); min-height:48px;
+}
+.pv-team.red .pv-row{grid-template-columns:1fr 44px 44px}
+.pv-team.red .pv-row .role{order:3; text-align:right}
+.pv-team.red .pv-row .nm{order:1; text-align:right}
+.pv-team.red .pv-row .pf{order:2}
+.pv-row .role{font-family:var(--f-mono); font-size:10px; color:var(--bone-2); letter-spacing:.1em; text-transform:uppercase}
+.pv-row .pf{
+  width:42px; height:42px; background:var(--ink-3); border:var(--edge) solid var(--bone-0);
+  position:relative; overflow:hidden;
+}
+.pv-row .pf img{width:100%; height:100%; object-fit:cover; display:block}
+.pv-row.empty .pf{background:repeating-linear-gradient(45deg,var(--ink-3) 0 5px,var(--ink-2) 5px 10px); border-style:dashed; opacity:.5}
+.pv-row.cur .pf{border-color:var(--accent); animation:pickring 1.4s ease-in-out infinite}
+@keyframes pickring{0%,100%{box-shadow:0 0 0 0 var(--accent-ring)} 50%{box-shadow:0 0 0 4px transparent}}
+.pv-row .nm{font-family:var(--f-display); font-weight:700; font-size:13px; letter-spacing:.04em; color:var(--bone-0); text-transform:uppercase; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.pv-row.empty .nm{color:var(--bone-3)}
+.pv-row.cur .nm{color:var(--accent)}
+
+/* Reasoning */
+.pv-bottom{padding:18px; flex:1; display:grid; grid-template-columns:1fr 1fr; gap:24px}
+@media (max-width:720px){.pv-bottom{grid-template-columns:1fr}}
+.pv-section .head{
+  font-family:var(--f-mono); font-size:10px; letter-spacing:.22em; color:var(--accent); text-transform:uppercase;
+  padding-bottom:6px; border-bottom:1.5px solid var(--accent); margin-bottom:14px;
+}
+.pv-section h4{
+  font-family:var(--f-display); font-weight:700; font-size:18px; letter-spacing:.06em; text-transform:uppercase;
+  margin-bottom:6px; color:var(--bone-0);
+}
+.pv-section .verdict{
+  font-style:italic; color:var(--bone-1); border-left:3px solid var(--accent); padding:2px 0 2px 12px;
+  font-size:13.5px; line-height:1.5; margin-bottom:14px;
+}
+.bullet{
+  display:flex; gap:8px; padding:6px 10px; margin-bottom:5px;
+  background:rgba(156,211,107,.05); border-left:2.5px solid rgba(156,211,107,.4);
+  font-size:12.5px; color:var(--bone-1);
+}
+.bullet.warn{background:rgba(245,176,39,.05); border-left-color:rgba(245,176,39,.4)}
+.bullet.bad{background:rgba(255,77,86,.05); border-left-color:rgba(255,77,86,.4)}
+.bullet .glyph{color:var(--ok); font-family:var(--f-display); font-weight:700; font-size:11px; flex-shrink:0; margin-top:1px}
+.bullet.warn .glyph{color:var(--warn)}
+.bullet.bad .glyph{color:var(--bad)}
+.barrow{margin-bottom:9px}
+.barrow .top{display:flex; justify-content:space-between; margin-bottom:4px}
+.barrow .lbl{font-family:var(--f-mono); font-size:9px; color:var(--bone-2); letter-spacing:.16em; text-transform:uppercase}
+.barrow .val{font-family:var(--f-display); font-weight:700; font-size:12px; color:var(--bone-0)}
+.bartrack{height:5px; background:var(--ink-4); border:1px solid var(--ink-5)}
+.barfill{height:100%; background:var(--accent)}
+
+/* ── Install / download ── */
+.install{
+  position:relative;
+  padding:96px 0;
+  background:linear-gradient(180deg, var(--ink-0), var(--ink-1));
+  border-top:1px solid var(--border);
+}
+.install::before{
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background:radial-gradient(ellipse at 50% 0%, var(--accent-glow), transparent 60%);
+  opacity:.35;
+}
+.install-grid{
+  position:relative;
+  display:grid; grid-template-columns:1.1fr 1fr; gap:64px; align-items:flex-start;
+}
+@media (max-width:980px){.install-grid{grid-template-columns:1fr}}
+.install h2{
+  font-family:var(--f-display); font-weight:700; font-size:clamp(48px,6vw,84px); line-height:.92;
+  text-transform:uppercase; letter-spacing:-.01em; color:var(--bone-0); margin:18px 0 24px;
+}
+.install h2 em{font-style:normal; color:var(--accent)}
+.install p.lead{color:var(--bone-1); font-size:16px; line-height:1.65; max-width:520px; margin-bottom:28px}
+.dl-card{
+  border:var(--edge) solid var(--bone-0); background:var(--ink-2);
+  position:relative;
+  box-shadow:8px 8px 0 var(--accent);
+}
+.dl-card .head{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:14px 18px; border-bottom:var(--edge) solid var(--bone-0); background:var(--ink-3);
+  font-family:var(--f-mono); font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--bone-2);
+}
+.dl-card .head .v{color:var(--accent)}
+.dl-card .body{padding:22px 24px}
+.dl-row{
+  display:flex; align-items:center; gap:16px; padding:16px 0;
+  border-bottom:1px solid var(--ink-5);
+}
+.dl-row:last-child{border-bottom:none}
+.dl-row .glyph{
+  width:42px; height:42px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  border:var(--edge) solid var(--bone-0); background:var(--ink-3);
+  font-family:var(--f-display); font-weight:700; font-size:18px; color:var(--bone-0);
+  letter-spacing:.04em;
+}
+.dl-row .info{flex:1; min-width:0}
+.dl-row .info .pf{font-family:var(--f-display); font-weight:700; font-size:15px; letter-spacing:.08em; color:var(--bone-0); text-transform:uppercase}
+.dl-row .info .meta{font-family:var(--f-mono); font-size:10px; letter-spacing:.16em; color:var(--bone-3); text-transform:uppercase; margin-top:3px}
+.dl-row .dl-btn{
+  font-family:var(--f-display); font-weight:700; font-size:12px; letter-spacing:.18em; text-transform:uppercase;
+  padding:9px 14px; border:var(--edge) solid var(--bone-0); background:var(--ink-1); color:var(--bone-0);
+  white-space:nowrap; transition:.12s;
+}
+.dl-row .dl-btn:hover{background:var(--accent); color:#000; border-color:var(--accent)}
+.dl-row.primary .dl-btn{background:var(--accent); color:#000; border-color:var(--accent)}
+.dl-row.primary .dl-btn:hover{background:var(--accent-hover); border-color:var(--accent-hover)}
+.dl-row.primary .glyph{background:var(--accent); color:#000; border-color:var(--accent)}
+.dl-row.disabled{opacity:.4}
+.dl-row.disabled .dl-btn{cursor:not-allowed}
+.checksum{
+  margin-top:14px; padding:10px 12px; background:var(--ink-1); border:1px solid var(--ink-5);
+  font-family:var(--f-mono); font-size:11px; color:var(--bone-2); word-break:break-all;
+  display:flex; gap:10px; align-items:center;
+}
+.checksum .k{color:var(--accent); letter-spacing:.16em}
+
+/* Steps */
+.steps{display:flex; flex-direction:column; gap:0; border-left:var(--edge) solid var(--bone-0); padding-left:0}
+.step{
+  position:relative; padding:18px 18px 18px 28px; border-bottom:1px solid var(--border);
+}
+.step:last-child{border-bottom:none}
+.step::before{
+  content:''; position:absolute; left:-2px; top:24px; width:14px; height:var(--edge); background:var(--accent);
+}
+.step .n{font-family:var(--f-mono); font-size:10px; letter-spacing:.22em; color:var(--accent); margin-bottom:8px; text-transform:uppercase}
+.step h4{font-family:var(--f-display); font-weight:700; font-size:18px; letter-spacing:.06em; text-transform:uppercase; margin-bottom:6px; color:var(--bone-0)}
+.step p{color:var(--bone-2); font-size:13.5px; line-height:1.6}
+.step code{font-family:var(--f-mono); font-size:11.5px; color:var(--accent); background:var(--ink-2); padding:1px 6px; border:1px solid var(--ink-5)}
+
+/* ── Stack ── */
+.stack-grid{
+  display:grid; grid-template-columns:repeat(4,1fr);
+  border:var(--edge) solid var(--bone-0);
+}
+@media (max-width:880px){.stack-grid{grid-template-columns:repeat(2,1fr)}}
+.stack-cell{
+  padding:24px 22px; border-right:1px solid var(--ink-5); border-bottom:1px solid var(--ink-5);
+  background:var(--ink-1);
+}
+.stack-cell:nth-child(4n){border-right:none}
+.stack-cell .layer{font-family:var(--f-mono); font-size:9px; letter-spacing:.22em; color:var(--accent); text-transform:uppercase; margin-bottom:12px}
+.stack-cell .item{display:flex; justify-content:space-between; gap:8px; padding:5px 0; font-size:13px; color:var(--bone-1); border-bottom:1px dashed var(--ink-5)}
+.stack-cell .item:last-child{border-bottom:none}
+.stack-cell .item .k{font-family:var(--f-display); font-weight:700; letter-spacing:.04em; color:var(--bone-0); text-transform:uppercase}
+.stack-cell .item .v{font-family:var(--f-mono); font-size:11px; color:var(--bone-3)}
+
+/* ── FAQ ── */
+.faq{display:flex; flex-direction:column}
+.qa{
+  border-top:1px solid var(--border); padding:22px 0;
+  display:grid; grid-template-columns:80px 1fr; gap:24px; align-items:flex-start;
+}
+.qa:last-child{border-bottom:1px solid var(--border)}
+.qa .num{font-family:var(--f-mono); font-size:11px; letter-spacing:.22em; color:var(--accent); padding-top:4px}
+.qa h4{font-family:var(--f-display); font-weight:700; font-size:22px; letter-spacing:.04em; text-transform:uppercase; color:var(--bone-0); margin-bottom:8px; line-height:1.15}
+.qa p{color:var(--bone-2); font-size:14px; line-height:1.65; max-width:680px}
+.qa p code{font-family:var(--f-mono); font-size:12.5px; color:var(--bone-0); background:var(--ink-2); padding:1px 6px; border:1px solid var(--ink-5)}
+
+/* ── Footer ── */
+footer{
+  padding:48px 0 36px; border-top:var(--edge) solid var(--bone-0);
+  background:var(--ink-1); position:relative;
+}
+.foot-grid{display:grid; grid-template-columns:1.4fr 1fr 1fr 1fr; gap:32px; align-items:flex-start}
+@media (max-width:720px){.foot-grid{grid-template-columns:1fr 1fr}}
+.foot-brand{display:flex; gap:14px; align-items:flex-start}
+.foot-brand img{width:48px; height:48px}
+.foot-brand .wm{font-family:var(--f-display); font-weight:700; font-size:20px; letter-spacing:.22em; line-height:1; margin-bottom:6px}
+.foot-brand p{font-family:var(--f-mono); font-size:11px; letter-spacing:.12em; color:var(--bone-3); line-height:1.5; max-width:280px}
+.foot-col h5{font-family:var(--f-mono); font-size:10px; letter-spacing:.22em; color:var(--accent); text-transform:uppercase; margin-bottom:14px; padding-bottom:6px; border-bottom:1px solid var(--accent); display:inline-block}
+.foot-col a{display:block; padding:5px 0; font-size:13px; color:var(--bone-2); transition:.12s}
+.foot-col a:hover{color:var(--bone-0)}
+.foot-bottom{
+  margin-top:48px; padding-top:24px; border-top:1px solid var(--border);
+  display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap;
+  font-family:var(--f-mono); font-size:10px; letter-spacing:.18em; color:var(--bone-3); text-transform:uppercase;
+}
+.foot-bottom .dis{max-width:560px}
+
+/* Marquee */
+.marquee{
+  border-top:var(--edge) solid var(--bone-0); border-bottom:var(--edge) solid var(--bone-0);
+  background:var(--accent); color:#000;
+  overflow:hidden; white-space:nowrap;
+  padding:14px 0;
+  font-family:var(--f-display); font-weight:700; font-size:18px; letter-spacing:.22em; text-transform:uppercase;
+}
+.marquee-track{display:inline-flex; gap:48px; animation:marquee 32s linear infinite}
+.marquee-track span{display:inline-flex; align-items:center; gap:48px}
+.marquee-track .sep{display:inline-block; width:8px; height:8px; background:#000; transform:rotate(45deg)}
+@keyframes marquee{from{transform:translateX(0)} to{transform:translateX(-50%)}}
+
+/* Anim */
+[data-reveal]{opacity:0; transform:translateY(14px); transition:opacity .55s ease-out, transform .55s ease-out}
+[data-reveal].in{opacity:1; transform:none}
+
+/* Small responsive tweaks */
+@media (max-width:560px){
+  .hero{padding:56px 0 56px}
+  section{padding:64px 0}
+  .install{padding:64px 0}
+}
+</style>
+</head>
+<body>
+
+<!-- ── NAV ─────────────────────────────────────── -->
+<nav class="nav">
+  <a href="#" class="nav-brand">
+    <img src="assets/logo.png" alt="DALIA"/>
+    <div>
+      <div class="wm">DALIA</div>
+      <div class="v">v1.0.0 · BUILD 2026.05</div>
+    </div>
+  </a>
+  <div class="nav-links">
+    <a href="#features">Fonctions</a>
+    <a href="#scoring">Scoring</a>
+    <a href="#preview">Aperçu</a>
+    <a href="#install">Installation</a>
+    <a href="#faq">FAQ</a>
+  </div>
+  <a href="#install" class="nav-cta">Télécharger</a>
+</nav>
+
+<!-- ── HERO ────────────────────────────────────── -->
+<header class="hero">
+  <div class="shell">
+    <div class="hero-grid">
+      <div>
+        <div class="hero-eyebrow">
+          <span class="eyebrow">Draft Analysis · League Intelligence Assistant</span>
+          <span class="mono-tag">PATCH 14.09 · WIN 10/11</span>
+        </div>
+        <h1>
+          DRAFT.<br/>
+          <span class="blade">DÉCIDE.</span><br/>
+          <span class="stroke">DOMINE.</span>
+        </h1>
+        <div class="hero-sub">Recommandations IA <span class="pipe">/</span> Matchups Live <span class="pipe">/</span> DuoQ</div>
+        <p class="hero-desc">
+          DALIA est un <strong>assistant de draft</strong> pour League of Legends. Connecté en direct au client, il analyse vos matchups, votre composition et le méta — puis recommande le pick optimal pour <strong>maximiser vos chances de victoire</strong>.
+        </p>
+        <div class="hero-cta">
+          <a href="#install" class="btn btn-primary">
+            <span>Télécharger</span>
+            <span class="arrow">↓</span>
+            <span class="meta">.MSI · 28 MB</span>
+          </a>
+          <a href="#preview" class="btn btn-ghost">
+            <span>Voir l'interface</span>
+            <span class="arrow">→</span>
+          </a>
+        </div>
+        <div class="hero-stats">
+          <div class="hero-stat"><div class="num">170+</div><div class="lbl">Champions analysés</div></div>
+          <div class="hero-stat"><div class="num">6</div><div class="lbl">Sous-scores fusionnés</div></div>
+          <div class="hero-stat"><div class="num">&lt;200<span style="font-size:18px">ms</span></div><div class="lbl">Latence reco</div></div>
+        </div>
+      </div>
+
+      <div class="hero-art">
+        <div class="frame"></div>
+        <div class="corner c-tr"></div>
+        <div class="corner c-bl"></div>
+        <div class="ring r2"></div>
+        <div class="ring r1"></div>
+        <img class="hero-logo" src="assets/logo.png" alt="DALIA logo"/>
+        <div class="corner-mark cm-tl">SOUL // EATER · ED 10</div>
+        <div class="corner-mark cm-br">VIVA · LA · DEATH</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ── MARQUEE ─────────────────────────────────── -->
+<div class="marquee">
+  <div class="marquee-track">
+    <span>
+      DRAFT FASTER · <i class="sep"></i> · PICK SMARTER · <i class="sep"></i> · BAN HARDER · <i class="sep"></i> · CLIMB HIGHER · <i class="sep"></i> · LIVE LCU SYNC · <i class="sep"></i> · DRAFT FASTER · <i class="sep"></i> · PICK SMARTER · <i class="sep"></i> · BAN HARDER · <i class="sep"></i> · CLIMB HIGHER · <i class="sep"></i> · LIVE LCU SYNC · <i class="sep"></i> ·
+    </span>
+  </div>
+</div>
+
+<!-- ── FEATURES ────────────────────────────────── -->
+<section id="features">
+  <div class="shell">
+    <div class="section-head" data-reveal>
+      <h2>Tout ce qu'il faut<br/>pour <em>verrouiller</em> la draft.</h2>
+      <div class="meta">
+        SECTION <strong>01</strong> / 05<br/>
+        FONCTIONNALITÉS CORE
+      </div>
+    </div>
+
+    <div class="features" data-reveal>
+      <div class="feat">
+        <span class="glyph">01</span>
+        <div class="num">// CORE</div>
+        <h3>Draft Board</h3>
+        <p>Interface 5v5 avec picks alliés par rôle et picks ennemis dans l'ordre de draft. Sélection de votre rôle, état des bans, slot courant mis en évidence en temps réel.</p>
+        <div class="tags"><span class="tag">5v5</span><span class="tag">Bans</span><span class="tag">Live</span></div>
+      </div>
+      <div class="feat">
+        <span class="glyph">02</span>
+        <div class="num">// IA</div>
+        <h3>Recommandations</h3>
+        <p>Scoring multi-facteurs : méta, matchups, synergies, composition d'équipe, maîtrise et risque de draft. Wild-cards hors-pool quand vos champions sont désavantagés.</p>
+        <div class="tags"><span class="tag hot">6 sous-scores</span><span class="tag">Wildcards</span></div>
+      </div>
+      <div class="feat">
+        <span class="glyph">03</span>
+        <div class="num">// MODÈLE</div>
+        <h3>Prédiction ML</h3>
+        <p>DraftNet — réseau de neurones PyTorch entraîné sur les matchs Master+. Embeddings de champions, interactions matchup 5×5 et probabilité de victoire calibrée par temperature scaling.</p>
+        <div class="tags"><span class="tag hot">DraftNet</span><span class="tag">PyTorch</span></div>
+      </div>
+      <div class="feat">
+        <span class="glyph">04</span>
+        <div class="num">// CLIENT</div>
+        <h3>LCU Sync</h3>
+        <p>Auto-détection du client League via lockfile. Synchronisation live des bans, picks, rôle et équipe pendant le champ select. Identité Summoner pour les stats personnelles.</p>
+        <div class="tags"><span class="tag">Tauri</span><span class="tag">Lockfile</span><span class="tag">Live</span></div>
+      </div>
+      <div class="feat">
+        <span class="glyph">05</span>
+        <div class="num">// DUO</div>
+        <h3>DuoQ</h3>
+        <p>Liaison par code unique avec votre partenaire. Visualisez son pool et son rôle, et la synergie duo est priorisée dans les recommandations. Pour grimper à deux sans bavure.</p>
+        <div class="tags"><span class="tag">Code unique</span><span class="tag">Pool partagé</span></div>
+      </div>
+      <div class="feat">
+        <span class="glyph">06</span>
+        <div class="num">// DATA</div>
+        <h3>Méta temps réel</h3>
+        <p>Tier list fusionnée patch courant + 30 jours, scrapée sur Lolalytics avec confiance sample-size. Matchups cross-lane, win rate, pick rate, ban rate. Cache TTL 6h.</p>
+        <div class="tags"><span class="tag">Lolalytics</span><span class="tag">WR/PR/BR</span></div>
+      </div>
+      <div class="feat">
+        <span class="glyph">07</span>
+        <div class="num">// POOL</div>
+        <h3>Champion Pool</h3>
+        <p>Éditeur drag &amp; drop, tier list S/A/B/C/D par rôle. Vos champions, votre maîtrise — DALIA pondère ses recommandations en conséquence. Pas de Yasuo dans votre pool, pas de Yasuo recommandé.</p>
+        <div class="tags"><span class="tag">S/A/B/C/D</span><span class="tag">DnD</span></div>
+      </div>
+      <div class="feat">
+        <span class="glyph">08</span>
+        <div class="num">// HISTORIQUE</div>
+        <h3>Insights &amp; Stats</h3>
+        <p>Sauvegarde de chaque draft, résultats win/loss/remake. Dashboard win rate, champions joués, performance par rôle, forme récente, taux de suivi des reco DALIA. Ranked via Riot API.</p>
+        <div class="tags"><span class="tag">KDA</span><span class="tag">CS/min</span><span class="tag">WR</span></div>
+      </div>
+      <div class="feat">
+        <span class="glyph">09</span>
+        <div class="num">// BANS</div>
+        <h3>Bans intelligents</h3>
+        <p>Suggestions de bans basées sur les counters de votre pool, les tiers S/A globaux et le taux de ban communautaire. Top 5 inline avec chaque draft.</p>
+        <div class="tags"><span class="tag">Top 5</span><span class="tag">Counter-aware</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── SCORING ────────────────────────────────── -->
+<section id="scoring">
+  <div class="shell">
+    <div class="section-head" data-reveal>
+      <h2>Le moteur — <em>six couches</em><br/>de raisonnement.</h2>
+      <div class="meta">
+        SECTION <strong>02</strong> / 05<br/>
+        DRAFT ENGINE<br/>
+        FUSION ML
+      </div>
+    </div>
+
+    <div class="pillars" data-reveal>
+      <div class="pillar"><div class="pct" style="font-size:30px; line-height:1.1">Matchup</div><div class="lbl">Couche 01</div><div class="desc">Avantage cross-lane, lane opponent prioritaire, données vslane.</div></div>
+      <div class="pillar"><div class="pct" style="font-size:30px; line-height:1.1">Maîtrise</div><div class="lbl">Couche 02</div><div class="desc">Pondération selon le tier du champion dans votre pool.</div></div>
+      <div class="pillar"><div class="pct" style="font-size:30px; line-height:1.1">Compo</div><div class="lbl">Couche 03</div><div class="desc">Équilibre AD/AP, tank, CC, engage, archétype d'équipe.</div></div>
+      <div class="pillar"><div class="pct" style="font-size:30px; line-height:1.1">Synergie</div><div class="lbl">Couche 04</div><div class="desc">Diversité dégâts, chaîne CC, engage + follow-up.</div></div>
+      <div class="pillar"><div class="pct" style="font-size:30px; line-height:1.1">Risque</div><div class="lbl">Couche 05</div><div class="desc">Pénalité picks risqués, flex faible, blind à risque.</div></div>
+      <div class="pillar"><div class="pct" style="font-size:30px; line-height:1.1">Méta</div><div class="lbl">Couche 06</div><div class="desc">Win rate, pick rate, ban rate avec confiance sample-size.</div></div>
+      <div class="pillar"><div class="pct" style="color:var(--bone-0); font-size:30px; line-height:1.1">DraftNet</div><div class="lbl">Fusion ML</div><div class="desc">Probabilité de victoire calibrée, fusionnée au scoring heuristique.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── PREVIEW ───────────────────────────────── -->
+<section id="preview">
+  <div class="shell">
+    <div class="section-head" data-reveal>
+      <h2>L'interface, <em>au combat</em>.</h2>
+      <div class="meta">
+        SECTION <strong>03</strong> / 05<br/>
+        APERÇU CHAMP-SELECT<br/>
+        SOUL EATER EDITION
+      </div>
+    </div>
+
+    <div class="preview-wrap" data-reveal>
+      <div class="preview-bar">
+        <div style="display:flex; gap:18px; align-items:center">
+          <div class="dots"><span></span><span></span><span></span></div>
+          <span>DALIA · DRAFT // PATCH 14.09 · MID</span>
+        </div>
+        <div class="right">
+          <span class="lcu">LCU CONNECTÉ</span>
+          <span>EUW · MASTER 142LP</span>
+          <span style="color:var(--accent)">28 SEC</span>
+        </div>
+      </div>
+
+      <div class="preview-body">
+        <!-- Sidebar reco -->
+        <aside class="pv-side">
+          <div class="head">SHORTLIST · MID · PICK 7</div>
+          <div class="reco sel">
+            <div class="rank">01</div>
+            <div class="port"><img src="https://ddragon.leagueoflegends.com/cdn/14.9.1/img/champion/Sylas.png" alt="" loading="lazy"/></div>
+            <div class="info">
+              <div class="name">SYLAS</div>
+              <div class="row">
+                <span class="score">87</span>
+                <span class="tier s">S</span>
+                <span class="ptag">Counter</span>
+              </div>
+            </div>
+          </div>
+          <div class="reco">
+            <div class="rank">02</div>
+            <div class="port"><img src="https://ddragon.leagueoflegends.com/cdn/14.9.1/img/champion/Vex.png" alt="" loading="lazy"/></div>
+            <div class="info">
+              <div class="name">VEX</div>
+              <div class="row">
+                <span class="score" style="color:var(--bone-0)">82</span>
+                <span class="tier a">A</span>
+                <span class="ptag">Safe blind</span>
+              </div>
+            </div>
+          </div>
+          <div class="reco">
+            <div class="rank">03</div>
+            <div class="port"><img src="https://ddragon.leagueoflegends.com/cdn/14.9.1/img/champion/Ahri.png" alt="" loading="lazy"/></div>
+            <div class="info">
+              <div class="name">AHRI</div>
+              <div class="row">
+                <span class="score" style="color:var(--bone-0)">78</span>
+                <span class="tier a">A</span>
+                <span class="ptag">Flex pick</span>
+              </div>
+            </div>
+          </div>
+          <div class="reco">
+            <div class="rank">04</div>
+            <div class="port"><img src="https://ddragon.leagueoflegends.com/cdn/14.9.1/img/champion/Orianna.png" alt="" loading="lazy"/></div>
+            <div class="info">
+              <div class="name">ORIANNA</div>
+              <div class="row">
+                <span class="score" style="color:var(--bone-0)">74</span>
+                <span class="tier b">B</span>
+                <span class="ptag">Synergie</span>
+              </div>
+            </div>
+          </div>
+          <div class="reco">
+            <div class="rank">05</div>
+            <div class="port"><img src="https://ddragon.leagueoflegends.com/cdn/14.9.1/img/champion/Viktor.png" alt="" loading="lazy"/></div>
+            <div class="info">
+              <div class="name">VIKTOR</div>
+              <div class="row">
+                <span class="score" style="color:var(--bone-0)">71</span>
+                <span class="tier b">B</span>
+                <span class="ptag">Méta forte</span>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Main board -->
+        <div class="pv-main">
+          <div class="pv-board">
+            <div class="pv-team blue">
+              <div class="th"><div class="name">BLUE</div><div class="side">ALLIÉ</div></div>
+              <div class="pv-bans">
+                <div class="pv-ban"><img src="https://ddragon.leagueoflegends.com/cdn/14.9.1/img/champion/Zed.png" alt="" loading="lazy"/></div>
+                <div class="pv-ban"><img src="https://ddragon.leagueoflegends.com/cdn/14.9.1/img/champion/Akali.png" alt="" loading="lazy"/></div>
+                <div class="pv-ban"><img src="https://ddragon.leagueoflegends.com/cdn/14.9.1/img/champion/Kassadin.png" alt="" loading="lazy"/></div>
+                <div class="pv-ban"><img src="https://ddragon.leagueoflegends.com/cdn/14.9.1/img/champion/Leblanc.png" alt="" loading="lazy"/></div>
+                <div class="pv-ban"><img src="https://ddragon.leagueoflegends.com/cdn/14.9.1/img/champion/Yone.png" alt="" loading="lazy"/></div>
+              </div>
+              <div class="pv-row"><div class="role">TOP</div><div class="pf"><img src="https://ddragon.leagueoflegends.com/cdn/14.9.1/img/champion/KSante.png" alt="" loading="lazy"/></div><div class="nm">K'SANTE</div></div>
+              <div class="pv-row"><div class="role">JNG</div><div class="pf"><img src="https://ddragon.leagueoflegends.com/cdn/14.9.1/img/champion/Viego.png" alt="" loading="lazy"/></div><div class="nm">VIEGO</div></div>
+              <div class="pv-row cur"><div class="role">MID</div><div class="pf"></div><div class="nm">→ MON PICK</div></div>
+              <div class="pv-row empty"><div class="role">BOT</div><div class="pf"></div><div class="nm">——</div></div>
+              <div class="pv-row empty"><div class="role">SUP</div><div class="pf"></div><div class="nm">——</div></div>
+            </div>
+            <div class="pv-team red">
+              <div class="th"><div class="side">ENNEMI</div><div class="name">RED</div></div>
+              <div class="pv-bans">
+                <div class="pv-ban"><img src="https://ddragon.leagueoflegends.com/cdn/14.9.1/img/champion/Fizz.png" alt="" loading="lazy"/></div>
+                <div class="pv-ban"><img src="https://ddragon.leagueoflegends.com/cdn/14.9.1/img/champion/Katarina.png" alt="" loading="lazy"/></div>
+                <div class="pv-ban"><img src="https://ddragon.leagueoflegends.com/cdn/14.9.1/img/champion/Qiyana.png" alt="" loading="lazy"/></div>
+                <div class="pv-ban"><img src="https://ddragon.leagueoflegends.com/cdn/14.9.1/img/champion/Talon.png" alt="" loading="lazy"/></div>
+                <div class="pv-ban"><img src="https://ddragon.leagueoflegends.com/cdn/14.9.1/img/champion/Annie.png" alt="" loading="lazy"/></div>
+              </div>
+              <div class="pv-row"><div class="nm">DARIUS</div><div class="pf"><img src="https://ddragon.leagueoflegends.com/cdn/14.9.1/img/champion/Darius.png" alt="" loading="lazy"/></div><div class="role">TOP</div></div>
+              <div class="pv-row"><div class="nm">XIN ZHAO</div><div class="pf"><img src="https://ddragon.leagueoflegends.com/cdn/14.9.1/img/champion/XinZhao.png" alt="" loading="lazy"/></div><div class="role">JNG</div></div>
+              <div class="pv-row"><div class="nm">YASUO</div><div class="pf"><img src="https://ddragon.leagueoflegends.com/cdn/14.9.1/img/champion/Yasuo.png" alt="" loading="lazy"/></div><div class="role">MID</div></div>
+              <div class="pv-row"><div class="nm">JINX</div><div class="pf"><img src="https://ddragon.leagueoflegends.com/cdn/14.9.1/img/champion/Jinx.png" alt="" loading="lazy"/></div><div class="role">BOT</div></div>
+              <div class="pv-row empty"><div class="nm">——</div><div class="pf"></div><div class="role">SUP</div></div>
+            </div>
+          </div>
+
+          <!-- Reasoning -->
+          <div class="pv-bottom">
+            <div class="pv-section">
+              <div class="head">ANALYSE — SYLAS</div>
+              <div class="verdict">Counter solide vs Yasuo et Darius. Ton pool A en mid, synergie correcte avec Viego. Pick fort en blind tardif.</div>
+              <div class="bullet"><span class="glyph">+</span><span>Lane Yasuo : <b>+6.4%</b> WR (Lolalytics, 12k matchs)</span></div>
+              <div class="bullet"><span class="glyph">+</span><span>Counter Darius via ult — vol de Apprehend</span></div>
+              <div class="bullet"><span class="glyph">+</span><span>Tier S sur ton pool — winrate perso 58%</span></div>
+              <div class="bullet warn"><span class="glyph">!</span><span>Compo : risque dégât AP-heavy (Sylas + K'Sante)</span></div>
+            </div>
+            <div class="pv-section">
+              <div class="head">BREAKDOWN</div>
+              <div class="barrow"><div class="top"><span class="lbl">Matchup</span><span class="val">94</span></div><div class="bartrack"><div class="barfill" style="width:94%"></div></div></div>
+              <div class="barrow"><div class="top"><span class="lbl">Maîtrise</span><span class="val">88</span></div><div class="bartrack"><div class="barfill" style="width:88%"></div></div></div>
+              <div class="barrow"><div class="top"><span class="lbl">Méta</span><span class="val">82</span></div><div class="bartrack"><div class="barfill" style="width:82%"></div></div></div>
+              <div class="barrow"><div class="top"><span class="lbl">Synergie</span><span class="val">71</span></div><div class="bartrack"><div class="barfill" style="width:71%"></div></div></div>
+              <div class="barrow"><div class="top"><span class="lbl">Compo</span><span class="val">62</span></div><div class="bartrack"><div class="barfill" style="width:62%"></div></div></div>
+              <div class="barrow"><div class="top"><span class="lbl">Risque</span><span class="val">35</span></div><div class="bartrack"><div class="barfill" style="width:35%; background:var(--warn)"></div></div></div>
+              <div style="margin-top:14px; padding-top:12px; border-top:1px solid var(--ink-5); display:flex; justify-content:space-between; align-items:baseline">
+                <span style="font-family:var(--f-mono); font-size:10px; letter-spacing:.22em; color:var(--bone-2); text-transform:uppercase">DraftNet · Win Probability</span>
+                <span style="font-family:var(--f-display); font-weight:700; font-size:28px; color:var(--accent)">61.4<span style="font-size:14px">%</span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── INSTALL ───────────────────────────────── -->
+<section id="install" class="install">
+  <div class="shell">
+    <div class="install-grid">
+      <div data-reveal>
+        <span class="eyebrow">Section 04 / 05 · Installation</span>
+        <h2>Téléchargez<br/>l'<em>installeur</em>.</h2>
+        <p class="lead">
+          Application desktop native — shell Tauri, payload léger, signée Windows. L'installeur configure DALIA, l'enregistre dans le menu démarrer et déploie le service de détection LCU. Aucun overlay, aucun hook in-game.
+        </p>
+
+        <div class="dl-card">
+          <div class="head">
+            <span>RELEASE · v<span class="v">1.0.0</span></span>
+            <span>2026.05.04</span>
+          </div>
+          <div class="body">
+            <div class="dl-row primary">
+              <div class="glyph">W</div>
+              <div class="info">
+                <div class="pf">Windows · x64</div>
+                <div class="meta">DALIA-Setup-1.0.0.msi · 28.4 MB</div>
+              </div>
+              <a href="#" class="dl-btn" data-download="msi">Télécharger</a>
+            </div>
+            <div class="dl-row">
+              <div class="glyph">W</div>
+              <div class="info">
+                <div class="pf">Windows · Portable</div>
+                <div class="meta">DALIA-Portable-1.0.0.exe · 32.1 MB</div>
+              </div>
+              <a href="#" class="dl-btn" data-download="exe">Télécharger</a>
+            </div>
+            <div class="dl-row disabled">
+              <div class="glyph">M</div>
+              <div class="info">
+                <div class="pf">macOS · Universal</div>
+                <div class="meta">Bientôt — LCU non supporté</div>
+              </div>
+              <a href="#" class="dl-btn">Bientôt</a>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div data-reveal>
+        <span class="eyebrow">Procédure · 4 étapes</span>
+        <h2 style="font-size:clamp(36px,4vw,52px); margin:18px 0 28px">Mise en route.</h2>
+        <div class="steps">
+          <div class="step">
+            <div class="n">// 01 · Téléchargement</div>
+            <h4>Récupérer l'installeur</h4>
+            <p>Téléchargez <code>DALIA-Setup-1.0.0.msi</code>. Windows SmartScreen peut afficher un avertissement la première fois — cliquez sur <code>Plus d'infos · Exécuter quand même</code>.</p>
+          </div>
+          <div class="step">
+            <div class="n">// 02 · Installation</div>
+            <h4>Lancer l'installeur</h4>
+            <p>Double-clic, accepter la licence MIT. DALIA s'installe par défaut dans <code>%LOCALAPPDATA%\\Programs\\DALIA</code>. Durée &lt; 30 secondes.</p>
+          </div>
+          <div class="step">
+            <div class="n">// 03 · Connexion serveur</div>
+            <h4>Renseigner l'URL backend</h4>
+            <p>Au premier lancement, ouvrir <code>Settings</code> et coller l'URL du serveur (ex: <code>https://dalia.up.railway.app</code>). Créer un compte ou se connecter.</p>
+          </div>
+          <div class="step">
+            <div class="n">// 04 · Champion pool</div>
+            <h4>Configurer son pool</h4>
+            <p>Dans l'éditeur, glisser-déposer vos champions par rôle dans les tiers S/A/B/C/D. DALIA détecte automatiquement le client League au prochain champ select.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── STACK ─────────────────────────────────── -->
+<section id="stack">
+  <div class="shell">
+    <div class="section-head" data-reveal>
+      <h2>Le matériel — <em>brutaliste</em>.</h2>
+      <div class="meta">
+        SECTION <strong>05</strong> / 05<br/>
+        STACK TECHNIQUE
+      </div>
+    </div>
+
+    <div class="stack-grid" data-reveal>
+      <div class="stack-cell">
+        <div class="layer">// FRONTEND</div>
+        <div class="item"><span class="k">React</span><span class="v">18.x</span></div>
+        <div class="item"><span class="k">Zustand</span><span class="v">4.x · 8 stores</span></div>
+        <div class="item"><span class="k">Tailwind</span><span class="v">3.x</span></div>
+        <div class="item"><span class="k">Vite</span><span class="v">5.x</span></div>
+        <div class="item"><span class="k">DnD-kit</span><span class="v">pool editor</span></div>
+      </div>
+      <div class="stack-cell">
+        <div class="layer">// DESKTOP</div>
+        <div class="item"><span class="k">Tauri</span><span class="v">v2 · Rust</span></div>
+        <div class="item"><span class="k">reqwest</span><span class="v">async http</span></div>
+        <div class="item"><span class="k">winreg</span><span class="v">détection LoL</span></div>
+        <div class="item"><span class="k">LCU API</span><span class="v">lockfile sync</span></div>
+        <div class="item"><span class="k">serde</span><span class="v">JSON</span></div>
+      </div>
+      <div class="stack-cell">
+        <div class="layer">// BACKEND</div>
+        <div class="item"><span class="k">FastAPI</span><span class="v">async</span></div>
+        <div class="item"><span class="k">SQLAlchemy</span><span class="v">2.0 · async</span></div>
+        <div class="item"><span class="k">PostgreSQL</span><span class="v">UUID · JSONB</span></div>
+        <div class="item"><span class="k">Alembic</span><span class="v">migrations</span></div>
+        <div class="item"><span class="k">JWT</span><span class="v">HS256 · bcrypt</span></div>
+      </div>
+      <div class="stack-cell">
+        <div class="layer">// ML / DATA</div>
+        <div class="item"><span class="k">PyTorch</span><span class="v">DraftNet</span></div>
+        <div class="item"><span class="k">AdamW</span><span class="v">CosineAnneal</span></div>
+        <div class="item"><span class="k">Lolalytics</span><span class="v">scraper · TTL 6h</span></div>
+        <div class="item"><span class="k">Riot API</span><span class="v">Match-v5</span></div>
+        <div class="item"><span class="k">DDragon</span><span class="v">champion data</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FAQ ───────────────────────────────────── -->
+<section id="faq">
+  <div class="shell">
+    <div class="section-head" data-reveal>
+      <h2>Questions <em>fréquentes</em>.</h2>
+      <div class="meta">
+        BONUS<br/>
+        TL;DR · LISEZ-MOI
+      </div>
+    </div>
+
+    <div class="faq" data-reveal>
+      <div class="qa">
+        <div class="num">// 01</div>
+        <div>
+          <h4>DALIA est-elle conforme aux Riot ToS ?</h4>
+          <p>Oui. DALIA lit l'API publique LCU (locale) du client League — la même que celle utilisée par les outils tiers acceptés. Aucune lecture mémoire, aucun hook in-game, aucun overlay au-dessus du jeu. L'app vit en parallèle, jamais par dessus.</p>
+        </div>
+      </div>
+      <div class="qa">
+        <div class="num">// 02</div>
+        <div>
+          <h4>Les recommandations marchent-elles sans serveur ?</h4>
+          <p>Non — le moteur de scoring et le modèle ML tournent côté backend. Vous devez héberger le serveur (Railway, Render, ou auto-hébergé) et coller l'URL dans <code>Settings</code>. Voir la procédure dans la section installation.</p>
+        </div>
+      </div>
+      <div class="qa">
+        <div class="num">// 03</div>
+        <div>
+          <h4>Pourquoi un mode anonyme ?</h4>
+          <p>Pour tester rapidement sans inscription. En mode anonyme, le client envoie le pool dans le body de chaque requête — pas d'historique ni de DuoQ. L'authentification (JWT) débloque tout : pool persistant, historique, liaison duo, stats Riot.</p>
+        </div>
+      </div>
+      <div class="qa">
+        <div class="num">// 04</div>
+        <div>
+          <h4>Que fait DraftNet exactement ?</h4>
+          <p>C'est un réseau de neurones PyTorch entraîné sur les matchs Master+ collectés via la Riot API. La sortie est une probabilité de victoire calibrée, fusionnée avec le scoring heuristique pour produire la recommandation finale.</p>
+        </div>
+      </div>
+      <div class="qa">
+        <div class="num">// 05</div>
+        <div>
+          <h4>Mac et Linux ?</h4>
+          <p>Le shell Tauri est cross-platform mais le connecteur LCU dépend de chemins Windows (lockfile, registre). macOS / Linux arriveront quand le client League aura un support natif sur ces plateformes — autant dire jamais. Une version cloud sans LCU est à l'étude.</p>
+        </div>
+      </div>
+      <div class="qa">
+        <div class="num">// 06</div>
+        <div>
+          <h4>Open source ?</h4>
+          <p>Licence MIT. Code complet dispo. Forks, PRs et issues bienvenus — pour proposer des règles d'edge case, raffiner les heuristiques de synergie ou améliorer le scraper Lolalytics.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ────────────────────────────────── -->
+<footer>
+  <div class="shell">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <img src="assets/logo.png" alt=""/>
+        <div>
+          <div class="wm">DALIA</div>
+          <p>Draft Analysis League Intelligence Assistant. Un projet personnel, libre et MIT. Non affilié à Riot Games.</p>
+        </div>
+      </div>
+      <div class="foot-col">
+        <h5>Produit</h5>
+        <a href="#features">Fonctions</a>
+        <a href="#scoring">Scoring</a>
+        <a href="#preview">Aperçu</a>
+        <a href="#install">Installation</a>
+      </div>
+      <div class="foot-col">
+        <h5>Releases</h5>
+        <a href="#install">v1.0.0 — Windows MSI</a>
+        <a href="#install">v1.0.0 — Portable EXE</a>
+        <a href="#">Changelog</a>
+        <a href="#">Notes de version</a>
+      </div>
+      <div class="foot-col">
+        <h5>Code</h5>
+        <a href="#">GitHub</a>
+        <a href="#">Issues</a>
+        <a href="#">Releases</a>
+        <a href="#">Licence MIT</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 DALIA · MIT LICENSE</span>
+      <span class="dis">League of Legends, Riot Games, et toutes les propriétés associées sont des marques déposées de Riot Games, Inc. DALIA n'est ni endossée ni sponsorisée par Riot Games.</span>
+      <span>SOUL · EATER · ED 10</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Reveal on scroll
+const io = new IntersectionObserver((entries) => {
+  for (const e of entries) {
+    if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+  }
+}, { threshold: 0.12 });
+document.querySelectorAll('[data-reveal]').forEach(el => io.observe(el));
+
+// Download buttons (placeholders — to wire to real release URLs on Vercel)
+document.querySelectorAll('[data-download]').forEach(b => {
+  b.addEventListener('click', (e) => {
+    e.preventDefault();
+    const kind = b.dataset.download;
+    // TODO: replace with Vercel-hosted release URL or GitHub Releases
+    console.log('Download requested:', kind);
+    b.textContent = 'Téléchargement…';
+    setTimeout(() => { b.textContent = 'Télécharger'; }, 1400);
+  });
+});
+</script>
+</body>
+</html>
