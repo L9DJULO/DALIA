@@ -598,10 +598,10 @@ footer{
           DALIA est un <strong>assistant de draft</strong> pour League of Legends. Connecté en direct au client, il analyse vos matchups, votre composition et le méta — puis recommande le pick optimal pour <strong>maximiser vos chances de victoire</strong>.
         </p>
         <div class="hero-cta">
-          <a href="#install" class="btn btn-primary">
+          <a href="https://github.com/L9DJULO/DALIA-RELOADED/releases/download/v2.0.0/DALIA_2.0.0_x64-setup.exe" class="btn btn-primary">
             <span>Télécharger</span>
             <span class="arrow">↓</span>
-            <span class="meta">.MSI · 28 MB</span>
+            <span class="meta">.EXE · 2.4 MB</span>
           </a>
           <a href="#preview" class="btn btn-ghost">
             <span>Voir l'interface</span>
@@ -910,25 +910,25 @@ footer{
 
         <div class="dl-card">
           <div class="head">
-            <span>RELEASE · v<span class="v">1.0.0</span></span>
-            <span>2026.05.04</span>
+            <span>RELEASE · v<span class="v">2.0.0</span></span>
+            <span>2026.05.10</span>
           </div>
           <div class="body">
             <div class="dl-row primary">
               <div class="glyph">W</div>
               <div class="info">
-                <div class="pf">Windows · x64</div>
-                <div class="meta">DALIA-Setup-1.0.0.msi · 28.4 MB</div>
+                <div class="pf">Windows · x64 — Installeur</div>
+                <div class="meta">DALIA_2.0.0_x64-setup.exe · 2.4 MB</div>
               </div>
-              <a href="#" class="dl-btn" data-download="msi">Télécharger</a>
+              <a href="https://github.com/L9DJULO/DALIA-RELOADED/releases/download/v2.0.0/DALIA_2.0.0_x64-setup.exe" class="dl-btn">Télécharger</a>
             </div>
             <div class="dl-row">
               <div class="glyph">W</div>
               <div class="info">
                 <div class="pf">Windows · Portable</div>
-                <div class="meta">DALIA-Portable-1.0.0.exe · 32.1 MB</div>
+                <div class="meta">dalia-client.exe · 5.6 MB</div>
               </div>
-              <a href="#" class="dl-btn" data-download="exe">Télécharger</a>
+              <a href="https://github.com/L9DJULO/DALIA-RELOADED/releases/download/v2.0.0/dalia-client.exe" class="dl-btn">Télécharger</a>
             </div>
             <div class="dl-row disabled">
               <div class="glyph">M</div>
@@ -958,9 +958,9 @@ footer{
             <p>Double-clic, accepter la licence MIT. DALIA s'installe par défaut dans <code>%LOCALAPPDATA%\\Programs\\DALIA</code>. Durée &lt; 30 secondes.</p>
           </div>
           <div class="step">
-            <div class="n">// 03 · Connexion serveur</div>
-            <h4>Renseigner l'URL backend</h4>
-            <p>Au premier lancement, ouvrir <code>Settings</code> et coller l'URL du serveur (ex: <code>https://dalia.up.railway.app</code>). Créer un compte ou se connecter.</p>
+            <div class="n">// 03 · Compte</div>
+            <h4>Créer un compte</h4>
+            <p>Au premier lancement, créer un compte ou se connecter. Le backend est déjà en ligne — aucune configuration serveur nécessaire.</p>
           </div>
           <div class="step">
             <div class="n">// 04 · Champion pool</div>
@@ -1043,8 +1043,8 @@ footer{
       <div class="qa">
         <div class="num">// 02</div>
         <div>
-          <h4>Les recommandations marchent-elles sans serveur ?</h4>
-          <p>Non — le moteur de scoring et le modèle ML tournent côté backend. Vous devez héberger le serveur (Railway, Render, ou auto-hébergé) et coller l'URL dans <code>Settings</code>. Voir la procédure dans la section installation.</p>
+          <h4>Faut-il héberger un serveur ?</h4>
+          <p>Non. Le backend tourne en permanence, rien à configurer de votre côté. Il suffit de télécharger l'app, de créer un compte et de jouer.</p>
         </div>
       </div>
       <div class="qa">
@@ -1099,17 +1099,17 @@ footer{
       </div>
       <div class="foot-col">
         <h5>Releases</h5>
-        <a href="#install">v1.0.0 — Windows MSI</a>
-        <a href="#install">v1.0.0 — Portable EXE</a>
-        <a href="#">Changelog</a>
-        <a href="#">Notes de version</a>
+        <a href="https://github.com/L9DJULO/DALIA-RELOADED/releases/download/v2.0.0/DALIA_2.0.0_x64-setup.exe">v2.0.0 — Windows Installer</a>
+        <a href="https://github.com/L9DJULO/DALIA-RELOADED/releases/download/v2.0.0/dalia-client.exe">v2.0.0 — Portable EXE</a>
+        <a href="https://github.com/L9DJULO/DALIA-RELOADED/releases">Changelog</a>
+        <a href="https://github.com/L9DJULO/DALIA-RELOADED/releases/tag/v2.0.0">Notes de version</a>
       </div>
       <div class="foot-col">
         <h5>Code</h5>
-        <a href="#">GitHub</a>
-        <a href="#">Issues</a>
-        <a href="#">Releases</a>
-        <a href="#">Licence MIT</a>
+        <a href="https://github.com/L9DJULO/DALIA-RELOADED">GitHub</a>
+        <a href="https://github.com/L9DJULO/DALIA-RELOADED/issues">Issues</a>
+        <a href="https://github.com/L9DJULO/DALIA-RELOADED/releases">Releases</a>
+        <a href="https://github.com/L9DJULO/DALIA-RELOADED/blob/main/LICENSE">Licence MIT</a>
       </div>
     </div>
     <div class="foot-bottom">
@@ -1128,18 +1128,6 @@ const io = new IntersectionObserver((entries) => {
   }
 }, { threshold: 0.12 });
 document.querySelectorAll('[data-reveal]').forEach(el => io.observe(el));
-
-// Download buttons (placeholders — to wire to real release URLs on Vercel)
-document.querySelectorAll('[data-download]').forEach(b => {
-  b.addEventListener('click', (e) => {
-    e.preventDefault();
-    const kind = b.dataset.download;
-    // TODO: replace with Vercel-hosted release URL or GitHub Releases
-    console.log('Download requested:', kind);
-    b.textContent = 'Téléchargement…';
-    setTimeout(() => { b.textContent = 'Télécharger'; }, 1400);
-  });
-});
 </script>
 </body>
 </html>
