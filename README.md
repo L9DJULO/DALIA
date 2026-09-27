@@ -37,7 +37,7 @@ les refaire et les convertir en WebP (qualité 82) sous les mêmes noms.
 
 ## Vérifier en local
 
-Les chemins sont absolus (`/assets/...`) : ouvrir le fichier directement ne suffit pas.
+Ouvrir `index.html` dans un navigateur suffit (chemins relatifs). Pour tester comme sur Vercel :
 
 ```bash
 python -m http.server 5500   # puis http://localhost:5500
