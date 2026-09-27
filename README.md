@@ -1,65 +1,52 @@
-# DALIA — Site
+# DALIA · site
 
-Landing page pour DALIA (Draft Analysis League Intelligence Assistant).
+Page de présentation et de téléchargement de DALIA (Draft Analysis League Intelligence Assistant),
+l'assistant de draft League of Legends. Code de l'application : [DALIA-RELOADED](https://github.com/L9DJULO/DALIA-RELOADED).
+
+Site statique, sans étape de build : HTML, CSS et JavaScript servis tels quels par Vercel.
 
 ## Structure
 
 ```
 .
-├── index.html       # Page unique
-├── assets/
-│   └── logo.png     # Logo Soul Eater
-└── vercel.json      # Config Vercel (cache + headers)
+├── index.html            # Page unique
+├── vercel.json           # Cache par type de fichier, en-têtes de sécurité (CSP)
+└── assets/
+    ├── css/site.css      # Styles : mêmes tokens que l'application (encre, os, un seul rouge)
+    ├── js/boot.js        # Active les apparitions avant le premier rendu
+    ├── js/site.js        # Dernière version GitHub, visite guidée, apparitions
+    ├── fonts/            # Oswald, Inter, JetBrains Mono (woff2, auto-hébergées)
+    ├── img/shots/        # Captures de l'application (WebP)
+    ├── img/stack/        # Logos des technologies (Simple Icons)
+    ├── img/og.png        # Aperçu pour les réseaux sociaux (1200×630)
+    └── logo.png          # Logo d'origine
 ```
 
-## Déploiement Vercel
+## Téléchargement
 
-### Option 1 — CLI
+Les boutons « Télécharger » pointent par défaut vers
+`https://github.com/L9DJULO/DALIA-RELOADED/releases/latest`. Au chargement, `site.js` interroge
+l'API GitHub, prend l'installeur `*-setup.exe` de la dernière release, et affiche sa version, sa
+date et sa taille. Publier une nouvelle release sur GitHub suffit : le site suit tout seul.
+
+## Captures
+
+Les captures de `assets/img/shots/` viennent de l'application (client DALIA-RELOADED 2.1) avec des
+données de démonstration, en 1280×800 à l'échelle 2. Après un changement visible de l'interface,
+les refaire et les convertir en WebP (qualité 82) sous les mêmes noms.
+
+## Vérifier en local
+
+Les chemins sont absolus (`/assets/...`) : ouvrir le fichier directement ne suffit pas.
 
 ```bash
-npm i -g vercel
-vercel             # première fois (preview)
-vercel --prod      # production
+python -m http.server 5500   # puis http://localhost:5500
 ```
 
-### Option 2 — GitHub
+## Déploiement
 
-1. Push le repo sur GitHub
-2. Vercel → "Add New Project" → import le repo
-3. Framework preset : **Other** (static)
-4. Root directory : `./`
-5. Deploy
+Vercel, préréglage **Other** (statique), racine `./`. Pousser sur `main` redéploie le site si le
+projet Vercel est relié au dépôt GitHub.
 
-## À câbler avant prod
-
-Les liens `href="#"` suivants pointent vers des ancres locales — à remplacer par tes vraies URLs :
-
-- Boutons **Télécharger** (`data-download="msi"` et `data-download="exe"`) → URL des releases
-  - Soit Vercel statique (`/releases/DALIA-Setup-1.0.0.msi`)
-  - Soit GitHub Releases
-- Footer : GitHub, Issues, Releases, Changelog, Licence MIT
-
-Cherche dans `index.html` les `href="#"` et les `data-download` pour le faire.
-
-## Mettre les binaires en téléchargement
-
-Le plus simple sur Vercel : crée un dossier `public/releases/` et y déposer les `.msi` / `.exe`. Vercel les servira directement.
-
-```
-public/
-└── releases/
-    ├── DALIA-Setup-1.0.0.msi
-    └── DALIA-Portable-1.0.0.exe
-```
-
-Puis remplace les boutons par :
-
-```html
-<a href="/releases/DALIA-Setup-1.0.0.msi" class="dl-btn">Télécharger</a>
-```
-
-> Vercel a une limite de 100 MB par fichier sur le plan Hobby — largement suffisant pour un Tauri.
-
-## Domaine custom
-
-Vercel → Project → Settings → Domains → ajoute `dalia.app` (ou autre).
+L'aperçu social (`og:image`) utilise un chemin relatif : une fois le domaine définitif connu,
+le remplacer par l'URL complète dans `index.html` pour les plateformes qui l'exigent.
