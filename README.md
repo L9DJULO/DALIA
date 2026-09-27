@@ -48,5 +48,4 @@ python -m http.server 5500   # puis http://localhost:5500
 Vercel, préréglage **Other** (statique), racine `./`. Pousser sur `main` redéploie le site si le
 projet Vercel est relié au dépôt GitHub.
 
-L'aperçu social (`og:image`) utilise un chemin relatif : une fois le domaine définitif connu,
-le remplacer par l'URL complète dans `index.html` pour les plateformes qui l'exigent.
+Adresse publique : https://dalia-two.vercel.app (déclarée dans `og:url`, `og:image` et `canonical` de `index.html` ; à changer si un domaine personnalisé est ajouté).
