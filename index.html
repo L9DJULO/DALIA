@@ -4,14 +4,14 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>DALIA · Assistant de draft League of Legends</title>
-  <meta name="description" content="DALIA lit ta sélection de champions en direct et classe tes picks, avec ses raisons et sa marge d’erreur. Gratuit, open source, pour Windows.">
+  <meta name="description" content="DALIA suit ta champ select en direct : quoi prendre, pourquoi, et à quel point c’est sûr. Gratuit, open source, pour Windows.">
   <link rel="canonical" href="https://dalia-two.vercel.app/">
   <meta name="color-scheme" content="dark">
   <meta name="theme-color" content="#08080a">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="DALIA">
-  <meta property="og:title" content="DALIA · Le bon pick, avant la fin du chrono">
-  <meta property="og:description" content="Assistant de draft pour League of Legends : analyse automatique à chaque pick, raisons en clair, marge d’erreur affichée.">
+  <meta property="og:title" content="DALIA · Lock ton pick en sachant pourquoi">
+  <meta property="og:description" content="Assistant de draft pour League of Legends : analyse en direct à chaque pick, raisons en clair, marge d’erreur affichée.">
   <meta property="og:url" content="https://dalia-two.vercel.app/">
   <meta property="og:image" content="https://dalia-two.vercel.app/assets/img/og.png">
   <meta property="og:image:width" content="1200">
@@ -62,8 +62,8 @@
       <div class="wrap hero__grid">
         <div class="hero__copy">
           <p class="eyebrow" data-enter>Assistant de draft · League of Legends</p>
-          <h1 id="hero-title" class="hero__title" data-enter>Le bon pick, avant la fin du chrono.</h1>
-          <p class="hero__sub" data-enter>DALIA lit ta sélection de champions en direct et classe tes picks, avec ses raisons et sa marge d’erreur.</p>
+          <h1 id="hero-title" class="hero__title" data-enter>Lock ton pick en sachant pourquoi.</h1>
+          <p class="hero__sub" data-enter>DALIA suit ta champ select en direct : quoi prendre, pourquoi, et à quel point c’est sûr.</p>
           <div class="hero__ctas" data-enter>
             <a class="btn btn--primary btn--lg" href="https://github.com/L9DJULO/DALIA-RELOADED/releases/latest" data-dl-href>
               Télécharger <span class="btn__meta" data-dl-meta>Windows · gratuit</span>
@@ -72,7 +72,7 @@
           </div>
         </div>
         <figure class="hero__shot" data-enter>
-          <img src="assets/img/shots/draft-1280.webp" srcset="assets/img/shots/draft-1280.webp 1280w, assets/img/shots/draft-2560.webp 2560w" sizes="(min-width: 1100px) 56vw, 92vw" width="1280" height="800" alt="L’écran de draft de DALIA pendant une sélection : Orianna conseillée à +2.4 points de win rate, plus ou moins 1.1, avec la shortlist, les raisons et les critères." fetchpriority="high">
+          <img src="assets/img/shots/draft-1280.webp" srcset="assets/img/shots/draft-1280.webp 1280w, assets/img/shots/draft-2560.webp 2560w" sizes="(min-width: 1100px) 56vw, 92vw" width="1280" height="800" alt="L’écran de draft de DALIA pendant une champ select : Orianna conseillée à +2.4 points de win rate, plus ou moins 1.1, avec la shortlist, les raisons et les critères." fetchpriority="high">
         </figure>
       </div>
       <div class="slash" aria-hidden="true"></div>
@@ -81,28 +81,28 @@
     <!-- ── En direct : les 30 secondes ───────── -->
     <section class="live" id="direct" aria-labelledby="live-title">
       <div class="wrap">
-        <h2 id="live-title" class="h2" data-reveal>Trente secondes pour choisir. DALIA suit chaque pick.</h2>
+        <h2 id="live-title" class="h2" data-reveal>30 secondes pour lock. DALIA suit chaque pick.</h2>
         <div class="clock" data-clock data-reveal>
           <div class="clock__scale" aria-hidden="true"><span>30 s</span><span>0 s</span></div>
           <div class="clock__track" aria-hidden="true"><span class="clock__fill"></span></div>
           <ol class="clock__moments">
             <li class="moment" style="--at: 6%; --t: .06">
-              <h3>La sélection commence</h3>
-              <p>DALIA repère le client League : ton équipe, ton rôle, ton ordre de pick.</p>
+              <h3>La champ select s’ouvre</h3>
+              <p>DALIA se branche sur ton client : ton équipe, ton rôle, ton ordre de pick. Rien à régler.</p>
             </li>
             <li class="moment" style="--at: 40%; --t: .40">
               <h3>Un pick tombe</h3>
-              <p>Pick, ban ou survol d’un allié : l’analyse repart toute seule. Rien à cliquer.</p>
+              <p>Pick, ban ou hover d’un mate : l’analyse repart toute seule. Rien à cliquer.</p>
             </li>
             <li class="moment" style="--at: 72%; --t: .72">
               <h3>C’est à toi</h3>
-              <p>Le pick conseillé, son avantage et ses raisons sont déjà à l’écran.</p>
+              <p>Le pick conseillé, pourquoi, et ce qui peut mal tourner : tout est déjà à l’écran.</p>
             </li>
           </ol>
         </div>
         <figure class="live__bar" data-reveal>
           <img src="assets/img/shots/urgent-bar.webp" width="2560" height="220" loading="lazy" alt="Le haut de l’écran de DALIA à 7 secondes : le chrono passe au rouge, les picks alliés et ennemis sont affichés.">
-          <figcaption>Sous 10 secondes, le chrono passe au rouge. Le reste de l’écran ne bouge pas.</figcaption>
+          <figcaption>Sous 10 secondes, le chrono passe au rouge. Rien d’autre ne bouge : tu sais où regarder.</figcaption>
         </figure>
       </div>
     </section>
@@ -110,32 +110,32 @@
     <!-- ── Visite de l'écran de draft ────────── -->
     <section class="tour" aria-labelledby="tour-title">
       <div class="wrap">
-        <h2 id="tour-title" class="h2 tour__title" data-reveal>Un seul écran pour trancher.</h2>
+        <h2 id="tour-title" class="h2 tour__title" data-reveal>Tout pour trancher, sur un seul écran.</h2>
         <div class="tour__grid">
           <ol class="tour__steps">
             <li class="step" data-focus="0 0 1280 800" data-scale="1" style="--x:0; --y:0; --w:1280; --h:420">
               <h3>Le bandeau</h3>
-              <p>Bans, picks et tour en cours, synchronisés avec le client. Un clic sur un emplacement pour corriger à la main.</p>
+              <p>Bans, picks, qui joue maintenant : synchro avec ton client. Un clic sur une case pour corriger à la main.</p>
               <div class="step__crop" aria-hidden="true"><img src="assets/img/shots/draft-1280.webp" alt="" loading="lazy" width="1280" height="800"></div>
             </li>
             <li class="step" data-focus="0 106 520 296" style="--x:0; --y:106; --w:520; --h:296">
               <h3>Le pick conseillé</h3>
-              <p>Son avantage en points de win rate face à ton pool, et l’incertitude juste à côté.</p>
+              <p>Combien de points de win rate il te donne de plus que ton pool, avec la marge d’erreur juste à côté.</p>
               <div class="step__crop" aria-hidden="true"><img src="assets/img/shots/draft-1280.webp" alt="" loading="lazy" width="1280" height="800"></div>
             </li>
             <li class="step" data-focus="0 402 520 360" style="--x:0; --y:402; --w:520; --h:360">
               <h3>La shortlist</h3>
-              <p>Chaque pick avec sa bande d’incertitude. Quand deux bandes se recouvrent, DALIA les annonce équivalents.</p>
+              <p>Tes meilleures options, chacune avec sa marge. Si deux se valent, DALIA te le dit : prends celle que tu maîtrises.</p>
               <div class="step__crop" aria-hidden="true"><img src="assets/img/shots/draft-1280.webp" alt="" loading="lazy" width="1280" height="800"></div>
             </li>
             <li class="step" data-focus="540 112 740 206" style="--x:540; --y:112; --w:740; --h:206">
               <h3>Pourquoi</h3>
-              <p>Les raisons du moteur en clair : synergies, matchups, points d’attention.</p>
+              <p>Les raisons en clair : synergie avec ton jungler, matchup en lane, ce qui peut te punir.</p>
               <div class="step__crop" aria-hidden="true"><img src="assets/img/shots/draft-1280.webp" alt="" loading="lazy" width="1280" height="800"></div>
             </li>
             <li class="step" data-focus="540 322 740 214" style="--x:540; --y:322; --w:740; --h:214">
               <h3>Ce qui pèse</h3>
-              <p>Chaque critère, pour ou contre toi. Plein s’il est mesuré sur des parties, hachuré s’il est estimé.</p>
+              <p>Chaque critère, pour ou contre toi. Barre pleine : mesuré sur de vraies games. Hachurée : estimé.</p>
               <div class="step__crop" aria-hidden="true"><img src="assets/img/shots/draft-1280.webp" alt="" loading="lazy" width="1280" height="800"></div>
             </li>
           </ol>
@@ -169,19 +169,19 @@
           </div>
         </div>
         <div class="score__copy">
-          <h2 id="score-title" class="h2" data-reveal>Pas de note sur 100. Un avantage, et sa marge.</h2>
+          <h2 id="score-title" class="h2" data-reveal>Pas de note sur 100. Un avantage, et sa marge d’erreur.</h2>
           <dl class="defs" data-reveal>
             <div>
               <dt>+2.4</dt>
-              <dd>Points de win rate de plus que la moyenne de ton pool, dans cette draft précise. Ce n’est pas une probabilité de victoire.</dd>
+              <dd>Points de win rate en plus par rapport à la moyenne de ton pool, dans cette draft. Pas ta chance de gagner la game.</dd>
             </div>
             <div>
               <dt>±1.1</dt>
-              <dd>L’incertitude. Moins il y a de parties observées, plus la bande s’élargit : DALIA ne fait pas semblant d’en savoir plus.</dd>
+              <dd>La marge d’erreur. Moins il y a de games pour juger, plus elle est large. DALIA ne bluffe pas.</dd>
             </div>
             <div>
               <dt>≈</dt>
-              <dd>Quand l’écart entre deux picks reste sous l’incertitude, ils sont annoncés équivalents. Tu prends celui que tu joues le mieux.</dd>
+              <dd>Si l’écart entre deux picks est plus petit que la marge, ils se valent. Prends celui que tu joues le mieux.</dd>
             </div>
           </dl>
         </div>
@@ -191,46 +191,46 @@
     <!-- ── Fonctions ─────────────────────────── -->
     <section class="features" id="fonctions" aria-labelledby="features-title">
       <div class="wrap">
-        <h2 id="features-title" class="h2" data-reveal>Avant la partie, pendant, et après.</h2>
+        <h2 id="features-title" class="h2" data-reveal>Avant la game, pendant, et après.</h2>
         <div class="bento">
           <article class="cell cell--pool" data-reveal>
             <div class="cell__img"><img src="assets/img/shots/pool.webp" width="1400" height="777" loading="lazy" alt="La page Pool de DALIA : les champions mid rangés par niveau, de S à D, et les champions à ajouter."></div>
             <div class="cell__txt">
-              <h3>Ton pool, niveau par niveau</h3>
-              <p>Range tes champions de S à D pour chaque rôle. DALIA en tient compte, et repère les réponses qui manquent à ton pool.</p>
+              <h3>Ton pool, de S à D</h3>
+              <p>Classe tes champions par rôle. DALIA en tient compte et te montre les trous dans ton pool.</p>
             </div>
           </article>
           <article class="cell cell--search" data-reveal>
             <div class="cell__img"><img src="assets/img/shots/search.webp" width="1040" height="620" loading="lazy" alt="La recherche de champion de DALIA : « nau » tapé, Nautilus proposé, Entrée pour choisir."></div>
             <div class="cell__txt">
               <h3>Au clavier</h3>
-              <p>Tape « nau », Entrée. Le champion est placé.</p>
+              <p>Tape « nau », Entrée. Nautilus est placé.</p>
             </div>
           </article>
           <article class="cell cell--duo" data-reveal>
             <div class="cell__txt">
               <h3>Duo Q</h3>
-              <p>Lie ton compte à celui de ton duo : son rôle et son pool entrent dans l’analyse.</p>
+              <p>Lie ton compte à celui de ton duo : son rôle et son pool comptent dans l’analyse.</p>
             </div>
           </article>
           <article class="cell cell--replays" data-reveal>
             <div class="cell__img"><img src="assets/img/shots/replays.webp" width="1400" height="602" loading="lazy" alt="La page Replays de DALIA : drafts enregistrées avec leur résultat, l’avantage conseillé et le bouton Rejouer."></div>
             <div class="cell__txt">
               <h3>Replays</h3>
-              <p>Rejoue une draft étape par étape, relance l’analyse, teste une variante. Tes résultats nourrissent tes statistiques.</p>
+              <p>Rejoue une draft pick par pick, teste une autre option, note si tu as gagné. Tes stats suivent.</p>
             </div>
           </article>
           <article class="cell cell--compare" data-reveal>
             <div class="cell__img"><img src="assets/img/shots/compare.webp" width="1200" height="957" loading="lazy" alt="La comparaison de deux champions dans DALIA : Orianna et Ahri, choix équivalents, critère par critère."></div>
             <div class="cell__txt">
               <h3>Deux champions face à face</h3>
-              <p>Même draft, mêmes préférences, critère par critère. DALIA dit si l’écart compte vraiment.</p>
+              <p>Même draft, critère par critère. DALIA te dit si l’écart compte vraiment ou si c’est du bruit.</p>
             </div>
           </article>
           <article class="cell cell--prefs" data-reveal>
             <div class="cell__txt">
               <h3>Tes réglages</h3>
-              <p>Ton rang choisit les statistiques utilisées. Tu règles le poids de chaque critère, et l’analyse se met à jour toute seule.</p>
+              <p>Ton elo choisit les stats utilisées, et c’est toi qui décides du poids de chaque critère. L’analyse suit toute seule.</p>
             </div>
           </article>
         </div>
@@ -250,26 +250,26 @@
           <a class="link" href="https://github.com/L9DJULO/DALIA-RELOADED/releases" rel="noopener">Toutes les versions</a>
           <ul class="download__needs">
             <li>Windows 10 ou 11, 64 bits</li>
-            <li>Le client League of Legends</li>
+            <li>League of Legends installé</li>
             <li>Un compte DALIA, créé au premier lancement</li>
           </ul>
         </div>
         <ol class="howto" data-reveal>
           <li>
             <h3>Télécharger</h3>
-            <p>Un installeur Windows de quelques mégaoctets, publié sur GitHub.</p>
+            <p>Un installeur Windows de quelques Mo, publié sur GitHub.</p>
           </li>
           <li>
             <h3>Installer</h3>
-            <p>Si Windows SmartScreen prévient, choisis « Informations complémentaires », puis « Exécuter quand même ».</p>
+            <p>Si SmartScreen râle, clique sur « Informations complémentaires », puis « Exécuter quand même ».</p>
           </li>
           <li>
             <h3>Se connecter</h3>
-            <p>Crée ton compte : il garde ton pool, tes replays et la liaison duo.</p>
+            <p>Crée ton compte : il garde ton pool, tes replays et ton duo.</p>
           </li>
           <li>
             <h3>Jouer</h3>
-            <p>Lance League. Dès la sélection des champions, DALIA remplit la draft et l’analyse.</p>
+            <p>Lance une game. Dès la champ select, DALIA remplit la draft et l’analyse.</p>
           </li>
         </ol>
       </div>
@@ -281,28 +281,28 @@
         <h2 id="faq-title" class="h2 faq__title" data-reveal>Questions fréquentes</h2>
         <div class="faq__list" data-reveal>
           <details>
-            <summary>DALIA touche-t-il au jeu ?</summary>
-            <p>Non. DALIA lit uniquement l’API locale du client League, celle qu’utilisent les outils de draft. Rien n’est injecté dans le jeu, aucune mémoire n’est lue, rien ne s’affiche par-dessus la partie.</p>
+            <summary>DALIA touche au jeu ?</summary>
+            <p>Non. DALIA lit seulement ce que ton client League expose en local, comme les outils de draft que tu connais. Rien n’est injecté, aucune mémoire n’est lue, rien ne s’affiche en game.</p>
           </details>
           <details>
-            <summary>Que veut dire +2.4 ?</summary>
-            <p>Environ 2,4 points de win rate de plus que la moyenne de ton pool dans cette draft. Le chiffre après ± est l’incertitude : il grandit quand les données manquent. Ce n’est pas une probabilité de victoire.</p>
+            <summary>+2.4, ça veut dire quoi ?</summary>
+            <p>Environ 2,4 points de win rate de plus que la moyenne de ton pool, dans cette draft. Le ± c’est la marge d’erreur : elle grossit quand il y a peu de games pour juger. Ce n’est pas ta chance de gagner.</p>
           </details>
           <details>
-            <summary>D’où viennent les données ?</summary>
-            <p>Des statistiques de parties par patch et par rang, du catalogue officiel des champions, de tes parties via l’API Riot, et de règles de kits pour les interactions que les statistiques ne voient pas.</p>
+            <summary>Les stats viennent d’où ?</summary>
+            <p>Des games classées par patch et par elo, du catalogue officiel des champions, de tes propres games via l’API Riot, et de règles de kits pour ce que les stats ne voient pas.</p>
           </details>
           <details>
-            <summary>Faut-il un compte ?</summary>
-            <p>Oui, gratuit. Il garde ton pool, tes replays, tes réglages et la liaison avec ton duo.</p>
+            <summary>Il faut un compte ?</summary>
+            <p>Oui, gratuit. Il garde ton pool, tes replays, tes réglages et ton duo.</p>
           </details>
           <details>
-            <summary>Et sur Mac ou Linux ?</summary>
-            <p>Pas pour l’instant : la lecture du client League repose sur Windows.</p>
+            <summary>Mac ou Linux ?</summary>
+            <p>Pas pour l’instant : la lecture du client League ne marche que sous Windows.</p>
           </details>
           <details>
-            <summary>Le code est-il ouvert ?</summary>
-            <p>Oui, sous licence MIT. Client, serveur et moteur sont sur GitHub ; les issues et les suggestions sont bienvenues.</p>
+            <summary>C’est open source ?</summary>
+            <p>Oui, licence MIT. Client, serveur et moteur sont sur GitHub. Issues et idées bienvenues.</p>
           </details>
         </div>
       </div>
@@ -312,8 +312,8 @@
     <section class="project" aria-labelledby="project-title">
       <div class="wrap project__grid">
         <div data-reveal>
-          <h2 id="project-title" class="h2">Un projet ouvert</h2>
-          <p class="project__text">DALIA est un projet personnel, construit avec Tauri et React côté bureau, FastAPI et PostgreSQL côté serveur.</p>
+          <h2 id="project-title" class="h2">Un projet perso, en open source</h2>
+          <p class="project__text">DALIA est construit avec Tauri et React côté app, FastAPI et PostgreSQL côté serveur. Tout le code est sur GitHub.</p>
           <a class="btn btn--ghost" href="https://github.com/L9DJULO/DALIA-RELOADED" rel="noopener">Voir le code</a>
         </div>
         <ul class="stack" data-reveal aria-label="Technologies">
@@ -332,7 +332,7 @@
 
   <footer class="footer">
     <div class="wrap">
-      <p class="footer__motto" aria-hidden="true">Draft. Décide. Domine.</p>
+      <div class="footer__moon" aria-hidden="true"><img src="assets/img/logo.webp" alt="" width="500" height="500" loading="lazy"></div>
       <div class="footer__grid">
         <div class="footer__brand">
           <img src="assets/img/logo.webp" alt="" width="56" height="56" loading="lazy">
