@@ -210,30 +210,40 @@ a, button, summary { -webkit-tap-highlight-color: transparent; touch-action: man
 /* ── En direct : trente secondes ───────────── */
 .live { padding-block: clamp(88px, 11vw, 160px) clamp(72px, 9vw, 128px); }
 .live .h2 { max-width: 22ch; }
-.clock { margin-top: clamp(40px, 5vw, 72px); }
+.clock {
+  display: grid; grid-template-columns: auto minmax(0, 1fr); gap: clamp(20px, 3vw, 40px); align-items: start;
+  margin-top: clamp(40px, 5vw, 72px);
+}
+/* Le chrono, comme dans l'application : os au calme, rouge sous 10 secondes */
+.clock__timer {
+  display: flex; align-items: baseline; justify-content: center; gap: 6px;
+  min-width: 132px; padding: 10px 18px 12px;
+  background: var(--ink-2); border: var(--edge) solid var(--bone-0);
+  transition: background-color 0.25s, border-color 0.25s;
+}
+.clock__n { font: 700 60px/1 var(--f-display); font-variant-numeric: tabular-nums; color: var(--bone-0); }
+.clock__u { font: 500 15px/1 var(--f-mono); color: var(--bone-2); transition: color 0.25s; }
+.clock.is-danger .clock__timer { background: var(--red); border-color: var(--red); box-shadow: 6px 6px 0 #000; }
+.clock.is-danger .clock__u { color: var(--bone-0); }
+.clock__bar { min-width: 0; }
 .clock__scale { display: flex; justify-content: space-between; margin-bottom: 10px; font: 500 13px/1 var(--f-mono); color: var(--bone-2); font-variant-numeric: tabular-nums; }
 .clock__track { position: relative; height: 12px; background: var(--ink-3); border: 1px solid var(--ink-5); overflow: hidden; }
-.clock__fill { position: absolute; inset: 0; background: var(--bone-0); transform-origin: right; }
-.clock.is-running .clock__fill { animation: drain 7s linear forwards; }
-@keyframes drain {
-  0% { transform: scaleX(1); background: var(--bone-0); }
-  66% { background: var(--bone-0); }
-  67% { background: var(--red); }
-  100% { transform: scaleX(0.06); background: var(--red); }
-}
+.clock__fill { position: absolute; inset: 0; background: var(--bone-0); transform-origin: right; transform: scaleX(var(--p, 1)); }
+.clock.is-danger .clock__fill { background: var(--red); }
 .clock__moments { position: relative; margin-top: 18px; min-height: 170px; }
-.moment { position: absolute; left: var(--at); top: 0; width: min(25%, 300px); padding-top: 22px; border-left: 1.5px solid var(--ink-5); padding-left: 16px; transition: border-color 0.3s; }
+.moment { position: absolute; left: var(--at); top: 0; width: min(28%, 300px); padding-top: 22px; border-left: 1.5px solid var(--ink-5); padding-left: 16px; transition: border-color 0.3s; }
 .moment::before { content: ""; position: absolute; left: -6px; top: -26px; width: 11px; height: 11px; background: var(--ink-1); border: 2px solid var(--bone-3); transform: rotate(45deg); transition: background-color 0.3s, border-color 0.3s; }
-.moment h3 { font: 700 22px/1.05 var(--f-display); letter-spacing: 0.04em; text-transform: uppercase; }
+.moment h3 { font: 700 22px/1.05 var(--f-display); letter-spacing: 0.04em; text-transform: uppercase; color: var(--bone-2); transition: color 0.3s; }
 .moment p { margin-top: 8px; font-size: 16px; line-height: 1.5; color: var(--bone-2); }
-.clock.is-running .moment { animation: moment-on 0.4s both; animation-delay: calc(var(--t) * 7s); }
-@keyframes moment-on { to { border-color: var(--bone-0); } }
-.clock.is-running .moment::before { animation: tick-on 0.4s both; animation-delay: calc(var(--t) * 7s); }
-@keyframes tick-on { to { background: var(--bone-0); border-color: var(--bone-0); } }
+.moment.is-on { border-left-color: var(--bone-0); }
+.moment.is-on::before { background: var(--bone-0); border-color: var(--bone-0); }
+.moment.is-on h3 { color: var(--bone-0); }
 .live__bar { margin-top: clamp(48px, 6vw, 88px); }
 .live__bar img { border: 1.5px solid var(--ink-5); }
 .live__bar figcaption { margin-top: 12px; font: 500 13px/1.5 var(--f-mono); color: var(--bone-2); }
 @media (max-width: 860px) {
+  .clock { grid-template-columns: minmax(0, 1fr); }
+  .clock__timer { justify-self: start; }
   .clock__moments { min-height: 0; display: grid; gap: 22px; margin-top: 26px; }
   .moment { position: relative; left: auto; width: auto; padding-top: 0; }
   .moment::before { left: -7px; top: 6px; }
@@ -466,9 +476,6 @@ a, button, summary { -webkit-tap-highlight-color: transparent; touch-action: man
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-delay: 0s !important; transition-duration: 0.01ms !important; }
   .js [data-reveal] { opacity: 1; transform: none; }
-  .clock .clock__fill { transform: scaleX(0.06); background: var(--red); }
-  .clock .moment { border-color: var(--bone-0); }
-  .clock .moment::before { background: var(--bone-0); border-color: var(--bone-0); }
 }
 
 @media (max-width: 480px) {

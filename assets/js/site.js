@@ -15,13 +15,34 @@
     reveals.forEach(el => el.classList.add('is-visible'));
   }
 
-  // ── Chrono : se vide une fois, quand il entre à l'écran ──
+  // ── Chrono : compte de 30 à 0, s'arrête un instant sur 00, puis une nouvelle champ select repart ──
+  // Le temps est accéléré (30 s affichées en 9 s). Il ne tourne que tant que la section est à
+  // l'écran ; en mouvement réduit, l'état fixe écrit dans le HTML (07 s, en rouge) reste affiché.
   const clock = document.querySelector('[data-clock]');
   if (clock && hasIO && !reduce) {
-    const io = new IntersectionObserver(([e]) => {
-      if (e.isIntersecting) { clock.classList.add('is-running'); io.disconnect(); }
-    }, { threshold: 0.6 });
-    io.observe(clock);
+    const counter = clock.querySelector('[data-clock-n]');
+    const moments = [...clock.querySelectorAll('.moment')].map(el => ({ el, at: parseFloat(el.style.getPropertyValue('--t')) || 0 }));
+    const TOTAL = 30, RUN = 9000, HOLD = 1600;
+    let raf = 0, start = 0, shown = '';
+
+    const render = remaining => {
+      const p = remaining / TOTAL;
+      clock.style.setProperty('--p', p.toFixed(4));
+      const text = String(Math.ceil(remaining)).padStart(2, '0');
+      if (text !== shown) { counter.textContent = text; shown = text; }
+      clock.classList.toggle('is-danger', remaining <= 10);
+      for (const m of moments) m.el.classList.toggle('is-on', 1 - p >= m.at);
+    };
+    const tick = now => {
+      const t = (now - start) % (RUN + HOLD);
+      render(t < RUN ? TOTAL * (1 - t / RUN) : 0);
+      raf = requestAnimationFrame(tick);
+    };
+    const play = () => { if (!raf) { start = performance.now(); raf = requestAnimationFrame(tick); } };
+    const stop = () => { cancelAnimationFrame(raf); raf = 0; };
+
+    render(TOTAL);
+    new IntersectionObserver(([e]) => (e.isIntersecting ? play() : stop()), { threshold: 0.35 }).observe(clock);
   }
 
   // ── Visite guidée : l'écran zoome sur la zone de l'étape lue ──

@@ -82,23 +82,26 @@
     <section class="live" id="direct" aria-labelledby="live-title">
       <div class="wrap">
         <h2 id="live-title" class="h2" data-reveal>30 secondes pour lock. DALIA suit chaque pick.</h2>
-        <div class="clock" data-clock data-reveal>
-          <div class="clock__scale" aria-hidden="true"><span>30 s</span><span>0 s</span></div>
-          <div class="clock__track" aria-hidden="true"><span class="clock__fill"></span></div>
-          <ol class="clock__moments">
-            <li class="moment" style="--at: 6%; --t: .06">
-              <h3>La champ select s’ouvre</h3>
-              <p>DALIA se branche sur ton client : ton équipe, ton rôle, ton ordre de pick. Rien à régler.</p>
-            </li>
-            <li class="moment" style="--at: 40%; --t: .40">
-              <h3>Un pick tombe</h3>
-              <p>Pick, ban ou hover d’un mate : l’analyse repart toute seule. Rien à cliquer.</p>
-            </li>
-            <li class="moment" style="--at: 72%; --t: .72">
-              <h3>C’est à toi</h3>
-              <p>Le pick conseillé, pourquoi, et ce qui peut mal tourner : tout est déjà à l’écran.</p>
-            </li>
-          </ol>
+        <div class="clock is-danger" data-clock data-reveal style="--p: .23">
+          <div class="clock__timer" aria-hidden="true"><span class="clock__n" data-clock-n>07</span><span class="clock__u">s</span></div>
+          <div class="clock__bar">
+            <div class="clock__scale" aria-hidden="true"><span>30 s</span><span>0 s</span></div>
+            <div class="clock__track" aria-hidden="true"><span class="clock__fill"></span></div>
+            <ol class="clock__moments">
+              <li class="moment is-on" style="--at: 6%; --t: .06">
+                <h3>La champ select s’ouvre</h3>
+                <p>DALIA se branche sur ton client : ton équipe, ton rôle, ton ordre de pick. Rien à régler.</p>
+              </li>
+              <li class="moment is-on" style="--at: 40%; --t: .40">
+                <h3>Un pick tombe</h3>
+                <p>Pick, ban ou hover d’un mate : l’analyse repart toute seule. Rien à cliquer.</p>
+              </li>
+              <li class="moment is-on" style="--at: 72%; --t: .72">
+                <h3>C’est à toi</h3>
+                <p>Le pick conseillé, pourquoi, et ce qui peut mal tourner : tout est déjà à l’écran.</p>
+              </li>
+            </ol>
+          </div>
         </div>
         <figure class="live__bar" data-reveal>
           <img src="assets/img/shots/urgent-bar.webp" width="2560" height="220" loading="lazy" alt="Le haut de l’écran de DALIA à 7 secondes : le chrono passe au rouge, les picks alliés et ennemis sont affichés.">
