@@ -1,6 +1,5 @@
-// DALIA · site : téléchargement de la dernière version, visite guidée, apparitions.
+// DALIA · site : visite guidée, apparitions. L'installeur est servi par le site (downloads/).
 (() => {
-  const REPO = 'L9DJULO/DALIA-RELOADED';
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const hasIO = 'IntersectionObserver' in window;
 
@@ -85,37 +84,4 @@
   } else {
     steps.forEach(s => s.classList.add('is-active'));
   }
-
-  // ── Dernière version publiée sur GitHub ──────
-  const links = document.querySelectorAll('[data-dl-href]');
-  if (!links.length || !('fetch' in window)) return;
-  const bytes = n => `${new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 }).format(n / 1048576)} Mo`;
-  const day = d => new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(d));
-
-  function apply(rel) {
-    const asset = rel.assets.find(a => /setup\.exe$/i.test(a.name)) || rel.assets.find(a => /\.(exe|msi)$/i.test(a.name));
-    if (!asset) return;
-    const version = String(rel.tag_name).replace(/^v/i, '');
-    links.forEach(a => { a.href = asset.browser_download_url; });
-    document.querySelectorAll('[data-dl-meta]').forEach(el => { el.textContent = `v${version} · ${bytes(asset.size)}`; });
-    document.querySelectorAll('[data-dl-release]').forEach(el => {
-      el.textContent = `Version ${version}, publiée le ${day(rel.published_at)}. Windows 10 et 11, 64 bits. Gratuit.`;
-    });
-  }
-
-  const KEY = 'dalia-latest-release';
-  try {
-    const cached = JSON.parse(sessionStorage.getItem(KEY) || 'null');
-    if (cached && Date.now() - cached.at < 30 * 60 * 1000) { apply(cached.rel); return; }
-  } catch { /* stockage indisponible : on interroge GitHub */ }
-
-  fetch(`https://api.github.com/repos/${REPO}/releases/latest`, { headers: { Accept: 'application/vnd.github+json' } })
-    .then(r => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
-    .then(rel => {
-      const slim = { tag_name: rel.tag_name, published_at: rel.published_at,
-        assets: (rel.assets || []).map(a => ({ name: a.name, size: a.size, browser_download_url: a.browser_download_url })) };
-      apply(slim);
-      try { sessionStorage.setItem(KEY, JSON.stringify({ at: Date.now(), rel: slim })); } catch { /* sans cache */ }
-    })
-    .catch(() => { /* les liens gardent la page des versions GitHub */ });
 })();

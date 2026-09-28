@@ -11,10 +11,11 @@ Site statique, sans étape de build : HTML, CSS et JavaScript servis tels quels 
 .
 ├── index.html            # Page unique
 ├── vercel.json           # Cache par type de fichier, en-têtes de sécurité (CSP)
+├── downloads/            # Installeur Windows servi par le site
 └── assets/
     ├── css/site.css      # Styles : mêmes tokens que l'application (encre, os, un seul rouge)
     ├── js/boot.js        # Active les apparitions avant le premier rendu
-    ├── js/site.js        # Dernière version GitHub, visite guidée, apparitions
+    ├── js/site.js        # Visite guidée, apparitions
     ├── fonts/            # Oswald, Inter, JetBrains Mono (woff2, auto-hébergées)
     ├── img/shots/        # Captures de l'application (WebP)
     ├── img/stack/        # Logos des technologies (Simple Icons)
@@ -24,10 +25,15 @@ Site statique, sans étape de build : HTML, CSS et JavaScript servis tels quels 
 
 ## Téléchargement
 
-Les boutons « Télécharger » pointent par défaut vers
-`https://github.com/L9DJULO/DALIA-RELOADED/releases/latest`. Au chargement, `site.js` interroge
-l'API GitHub, prend l'installeur `*-setup.exe` de la dernière release, et affiche sa version, sa
-date et sa taille. Publier une nouvelle release sur GitHub suffit : le site suit tout seul.
+L'installeur est servi par le site lui-même : `downloads/DALIA_X.Y.Z_x64-setup.exe`, en
+téléchargement (`Content-Disposition: attachment`) et en cache permanent — le nom porte la
+version. Les deux boutons « Télécharger » de `index.html` pointent dessus, avec la version et la
+taille écrites en dur.
+
+Pour une nouvelle version : construire l'installeur dans DALIA-RELOADED
+(`scripts/build-client.ps1`), le copier dans `downloads/`, retirer l'ancien, puis mettre à jour
+dans `index.html` les deux liens, la taille et la ligne « Version X.Y.Z, publiée le … ».
+Le lien « Versions précédentes » mène aux releases GitHub.
 
 ## Captures
 
